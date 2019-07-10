@@ -50,8 +50,9 @@ along with MathBook XML.  If not, see <http://www.gnu.org/licenses/>.
 <!-- conversion.  But obviously, there are many PreTeXt constructions    -->
 <!-- which cannot be realized in text.                                   -->
 <!--                                                                     -->
-<!-- Goal is to make it so *no* conversion needs to import  -->
-<!-- "mathbook-common.xsl" since some foundational conversion will.      -->
+<!-- Goal is to make it so *no* conversion imports "mathbook-common.xsl" -->
+<!-- since some foundational conversion (such as this one) can be the    -->
+<!-- basis of the conversion and will import the foundationa one instead.-->
 <!--                                                                     -->
 <!-- Initial work might be to implement certain characters as 7-bit      -->
 <!-- ASCII and as Unicode, under the control of a switch.  For example,  -->
@@ -76,11 +77,45 @@ along with MathBook XML.  If not, see <http://www.gnu.org/licenses/>.
 <!-- TEMPORARY: defined to stop errors, need stubs in -common -->
 <xsl:template name="inline-warning"/>
 <xsl:template name="margin-warning"/>
-<xsl:template name="sage-active-markup"/>
+<xsl:template match="sage" mode="sage-active-markup"/>
 <xsl:template name="sage-display-markup"/>
 
-<!-- TODO: implement titles/headings for divisions, -->
-<!-- with two blank lines prior?                    -->
+<!-- ######### -->
+<!-- Divisions -->
+<!-- ######### -->
+
+<xsl:template match="part|chapter|section|subsection|subsubsection|exercises|reading-questions|worksheet|glossary|references|solutions">
+    <!-- empty line prior -->
+    <xsl:text>&#xa;</xsl:text>
+    <xsl:apply-templates select="." mode="type-name"/>
+    <xsl:text> </xsl:text>
+    <xsl:apply-templates select="." mode="number"/>
+    <!-- Title is required (or default is supplied) -->
+    <xsl:text> </xsl:text>
+    <xsl:apply-templates select="." mode="title-full"/>
+    <xsl:text>&#xa;</xsl:text>
+    <!-- metadata-ish, eg "title", should be killed by default -->
+    <xsl:apply-templates/>
+</xsl:template>
+
+<!-- ################ -->
+<!-- Cross-References -->
+<!-- ################ -->
+
+<!-- Nothing fancy (like in LaTeX conversion) for  -->
+<!-- the number of the target of a cross-reference -->
+<xsl:template match="*" mode="xref-number">
+    <xsl:apply-templates select="." mode="number"/>
+</xsl:template>
+
+<!-- No good way to link/direct to target, so we just   -->
+<!-- parrot the text produced typically for a clickable -->
+<xsl:template match="xref" mode="xref-link">
+    <xsl:param name="target"/>
+    <xsl:param name="content"/>
+
+    <xsl:value-of select="$content"/>
+</xsl:template>
 
 <!-- Characters -->
 
@@ -144,10 +179,205 @@ along with MathBook XML.  If not, see <http://www.gnu.org/licenses/>.
 </xsl:template>
 
 <xsl:template match="p">
-    <!-- space with a blank line -->
-    <xsl:text>&#xa;</xsl:text>
+    <!-- space with a blank line if not -->
+    <!-- first in a structured element  -->
+    <!-- barring metadata-ish           -->
+    <xsl:if test="preceding-sibling::*[not(self::title)]">
+        <xsl:text>&#xa;</xsl:text>
+    </xsl:if>
+    <!-- mixed-content -->
     <xsl:apply-templates/>
-    <!-- end at newline -->
+    <!-- end onto a newline -->
+    <xsl:text>&#xa;</xsl:text>
+</xsl:template>
+
+<!-- ############ -->
+<!-- Environments -->
+<!-- ############ -->
+
+<xsl:template match="&REMARK-LIKE;">
+    <!-- space with a blank line if not -->
+    <!-- first in a structured element  -->
+    <!-- barring metadata-ish           -->
+    <xsl:if test="preceding-sibling::*[not(self::title)]">
+        <xsl:text>&#xa;</xsl:text>
+    </xsl:if>
+    <xsl:apply-templates select="." mode="type-name"/>
+    <xsl:text> </xsl:text>
+    <xsl:apply-templates select="." mode="number"/>
+    <xsl:if test="title">
+        <xsl:text> </xsl:text>
+        <xsl:apply-templates select="." mode="title-full"/>
+    </xsl:if>
+    <xsl:text>&#xa;</xsl:text>
+    <!-- structured -->
+    <xsl:apply-templates select="*"/>
+</xsl:template>
+
+<xsl:template match="&EXAMPLE-LIKE;">
+    <!-- space with a blank line if not -->
+    <!-- first in a structured element  -->
+    <!-- barring metadata-ish           -->
+    <xsl:if test="preceding-sibling::*[not(self::title)]">
+        <xsl:text>&#xa;</xsl:text>
+    </xsl:if>
+    <xsl:apply-templates select="." mode="type-name"/>
+    <xsl:text> </xsl:text>
+    <xsl:apply-templates select="." mode="number"/>
+    <xsl:if test="title">
+        <xsl:text> </xsl:text>
+        <xsl:apply-templates select="." mode="title-full"/>
+    </xsl:if>
+    <xsl:text>&#xa;</xsl:text>
+    <xsl:choose>
+        <xsl:when test="statement">
+            <xsl:apply-templates select="statement"/>
+            <xsl:apply-templates select="hint|answer|solution"/>
+        </xsl:when>
+        <xsl:otherwise>
+            <xsl:apply-templates select="*[self::hint|self::answer|self::solution]"/>
+        </xsl:otherwise>
+    </xsl:choose>
+</xsl:template>
+
+<xsl:template match="&THEOREM-LIKE;">
+    <!-- space with a blank line if not -->
+    <!-- first in a structured element  -->
+    <!-- barring metadata-ish           -->
+    <xsl:if test="preceding-sibling::*[not(self::title)]">
+        <xsl:text>&#xa;</xsl:text>
+    </xsl:if>
+    <xsl:apply-templates select="." mode="type-name"/>
+    <xsl:text> </xsl:text>
+    <xsl:apply-templates select="." mode="number"/>
+    <xsl:if test="title">
+        <xsl:text> </xsl:text>
+        <xsl:apply-templates select="." mode="title-full"/>
+    </xsl:if>
+    <xsl:text>&#xa;</xsl:text>
+    <xsl:choose>
+        <xsl:when test="statement">
+            <xsl:apply-templates select="statement"/>
+            <xsl:apply-templates select="proof"/>
+        </xsl:when>
+        <xsl:otherwise>
+            <xsl:apply-templates select="*[self::proof]"/>
+        </xsl:otherwise>
+    </xsl:choose>
+</xsl:template>
+
+<!-- General-purpose container, we  -->
+<!-- do not enforce possibilities -->
+<xsl:template match="statement">
+    <!-- structured -->
+    <xsl:apply-templates select="*"/>
+</xsl:template>
+
+<!-- THEOREM-LIKE only -->
+<xsl:template match="proof">
+    <xsl:apply-templates select="." mode="type-name"/>
+    <xsl:text>.&#xa;</xsl:text>
+    <!-- structured -->
+    <xsl:apply-templates select="*"/>
+</xsl:template>
+
+<!-- ######### -->
+<!-- Exercises -->
+<!-- ######### -->
+
+<xsl:template match="exercise">
+    <!-- space with a blank line if not -->
+    <!-- first in a structured element  -->
+    <!-- barring metadata-ish           -->
+    <xsl:if test="preceding-sibling::*[not(self::title)]">
+        <xsl:text>&#xa;</xsl:text>
+    </xsl:if>
+    <xsl:apply-templates select="." mode="serial-number"/>
+    <xsl:text>.</xsl:text>
+    <xsl:if test="title">
+        <xsl:text> (</xsl:text>
+        <xsl:apply-templates select="." mode="title-full"/>
+        <xsl:text>)</xsl:text>
+    </xsl:if>
+    <xsl:text> </xsl:text>
+    <xsl:choose>
+        <xsl:when test="statement">
+            <xsl:apply-templates select="statement"/>
+            <xsl:apply-templates select="hint|answer|solution"/>
+        </xsl:when>
+        <xsl:otherwise>
+            <xsl:apply-templates select="*[self::hint|self::answer|self::solution]"/>
+        </xsl:otherwise>
+    </xsl:choose>
+</xsl:template>
+
+<xsl:template match="hint|answer|solution">
+    <xsl:apply-templates select="." mode="type-name"/>
+    <xsl:variable name="the-number">
+        <xsl:apply-templates select="." mode="non-singleton-number" />
+    </xsl:variable>
+    <!-- An empty value means element is a singleton -->
+    <!-- else the serial number comes through        -->
+    <xsl:if test="not($the-number = '')">
+        <xsl:text> </xsl:text>
+        <xsl:apply-templates select="." mode="serial-number" />
+    </xsl:if>
+    <xsl:text>. </xsl:text>
+    <xsl:apply-templates/>
+    <!-- not needed if structured -->
+    <xsl:text>&#xa;</xsl:text>
+</xsl:template>
+
+<!-- ############### -->
+<!-- Captioned Items -->
+<!-- ############### -->
+
+<xsl:template match="figure">
+    <!-- space with a blank line if not -->
+    <!-- first in a structured element  -->
+    <!-- barring metadata-ish           -->
+    <xsl:if test="preceding-sibling::*[not(self::title)]">
+        <xsl:text>&#xa;</xsl:text>
+    </xsl:if>
+    <xsl:apply-templates select="." mode="type-name"/>
+    <xsl:text> </xsl:text>
+    <xsl:apply-templates select="." mode="number"/>
+    <xsl:text>: </xsl:text>
+    <xsl:apply-templates select="caption"/>
+    <xsl:text>&#xa;</xsl:text>
+</xsl:template>
+
+<xsl:template match="caption">
+    <!-- mixed-content -->
+    <xsl:apply-templates/>
+</xsl:template>
+
+<!-- ##### -->
+<!-- Lists -->
+<!-- ##### -->
+
+<xsl:template match="ul|ol|dl">
+    <xsl:text>&#xa;</xsl:text>
+    <xsl:apply-templates select="li"/>
+</xsl:template>
+
+<xsl:template match="ol/li">
+    <xsl:apply-templates select="." mode="serial-number"/>
+    <xsl:text>. </xsl:text>
+    <xsl:apply-templates/>
+    <xsl:text>&#xa;</xsl:text>
+</xsl:template>
+
+<xsl:template match="ul/li">
+    <xsl:text>* </xsl:text>
+    <xsl:apply-templates/>
+    <xsl:text>&#xa;</xsl:text>
+</xsl:template>
+
+<xsl:template match="dl/li">
+    <xsl:apply-templates select="." mode="title-full"/>
+    <xsl:text> </xsl:text>
+    <xsl:apply-templates/>
     <xsl:text>&#xa;</xsl:text>
 </xsl:template>
 

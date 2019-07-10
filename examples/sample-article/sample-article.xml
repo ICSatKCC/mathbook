@@ -27,7 +27,7 @@ xsltproc /path/to/mathbook/xsl/mathbook-html.xsl /path/to/mathbook/examples/samp
 then find  "derivatives.html"  in the current working directory
 and use a web browser to view.  For PDF/print, issue:
 
-xsltproc /path/to/mathbook/xsl/mathbook-latex.xsl /path/to/mathbook/examples/sample-article.xml
+xsltproc -o derivatives.tex /path/to/mathbook/xsl/mathbook-latex.xsl /path/to/mathbook/examples/sample-article.xml
 
 and apply  pdflatex  or  xelatex  to  "derivatives.tex"  in
 the current working directory.
@@ -43,11 +43,11 @@ the xsltproc executable.
 <!-- Overall element for a Mathbook XML document; mandatory, always  -->
 <!-- Experiment with the "xml:lang" attribute to see localization    -->
 <!-- changes, the  xsl/localizations  directory has more information -->
-<mathbook>
-<!-- <mathbook xml:lang="pt-BR"> -->
-<!-- <mathbook xml:lang="fr-FR"> -->
-<!-- <mathbook xml:lang="cs-CZ"> -->
-<!-- <mathbook xml:lang="af-ZA"> -->
+<pretext>
+<!-- <pretext xml:lang="pt-BR"> -->
+<!-- <pretext xml:lang="fr-FR"> -->
+<!-- <pretext xml:lang="cs-CZ"> -->
+<!-- <pretext xml:lang="af-ZA"> -->
 
     <!--
     "docinfo" is like metadata, it is necessary technical
@@ -165,13 +165,14 @@ the xsltproc executable.
 
         You can make a document-specific, global override.  Here we
         decide we have no need for any "proposition"s and repurpose
-        that environment in US English as a "Conundrum."
+        that environment as a "Conundrum."
 
-        See the localization file for more on language codes, and realize
-        that US English is the default if there is no "lang" attribute
-        given on the document.
+        The specification of a language is optional, if you do not
+        have a multilingual project.  Otherwise you can supply an
+        @xml:lang attribute so the rename only applies for a specific
+        language.  See the localization file for more on language codes.
         -->
-        <rename element="proposition" lang="en-US">Conundrum</rename>
+        <rename element="proposition">Conundrum</rename>
 
         <!-- Various third-party add-ons need some sort of token     -->
         <!-- Using an element here serves two purposes               -->
@@ -365,9 +366,9 @@ the xsltproc executable.
 
             <p>When we are writing we do not always know what we want to cite, or just where subsequent material will end up.  For example, we might want a citation to <xref provisional="some textbook about the FTC" /> or we might want to reference a later<nbsp /><xref provisional="chapter about DiffEq's, and an_underscore" />.</p>
 
-            <p>We can also embed <q>todo</q>s in the source, and selectively display them, so you may not see the one here in the output you are looking at now.  Or maybe you do see it?</p>
+            <p>We can also embed <q>todo</q>s in the source by making an <init>XML</init> comment that begins with the four characters <c>todo</c>, and selectively display them, so you may not see the one here in the output you are looking at now.  Or maybe you do see it?</p>
 
-<todo>Talk more about author's tools, such as todo's</todo>
+            <!-- todo: Talk more about author's tools, such as todo's -->
 
             <p>Because a definite integral can be computed using an antiderivative, we have the following definition.</p>
 
@@ -411,16 +412,27 @@ the xsltproc executable.
             <idx><h>Sage</h><h>integration</h><h>numerical</h></idx>
             <idx><h>numerical</h><see>Sage integration</see></idx>
             <idx><h>numerical</h><see>Sage</see></idx>
+            <!-- index entry, plus a seealso for additional -->
+            <idx>numerics</idx>
             <idx><h>numerics</h><seealso>Sage</seealso></idx>
-            <idx><h>numerical integration</h><h>Sage</h><h>cell</h></idx>
             <idx><h>numerical integration</h><h>Sage</h><h>cell</h><see>Sage</see></idx>
             <!-- Index testing, at most one see/seealso per index -->
-            <idx><h>A</h></idx>
             <idx><h>A</h><see>F</see></idx>
             <idx><h>A</h><see>G</see></idx>
-            <idx><h>A</h><seealso>H</seealso></idx>
-            <idx><h>A</h><h>B</h><seealso>C</seealso></idx>
-            <idx><h>A</h><h>B</h><h>C</h><see>D</see></idx>
+            <idx><h>A</h><see>H</see></idx>
+            <idx><h>A</h><h>B</h></idx>
+            <idx><h>A</h><h>B</h><h>C</h></idx>
+            <idx><h>A</h><h>B</h><h>C</h><seealso>D</seealso></idx>
+            <idx><h>A</h><h>B</h><h>C</h><seealso>A</seealso></idx>
+            <!--  -->
+            <!-- Index testing, at most one see/seealso per index -->
+            <idx><h>X</h></idx>
+            <idx><h>X</h><seealso>F</seealso></idx>
+            <idx><h>X</h><seealso>G</seealso></idx>
+            <idx><h>X</h><seealso>H</seealso></idx>
+            <idx><h>X</h><h>Y</h></idx>
+            <idx><h>X</h><h>Y</h><h>Z</h><see>D</see></idx>
+            <idx><h>X</h><h>Y</h><h>Z</h><see>A</see></idx>
             <!--  -->
             <!-- Index testing, fancy variant -->
             <idx>mixed-content <em>emphasized</em></idx>
@@ -432,6 +444,15 @@ the xsltproc executable.
             <idx><c>verbatim text</c>, use sortby</idx>
             <!-- keep this, collides with real "R" entry elsewhere -->
             <idx sortby="R"><m>\rho</m><ndash />fibers</idx>
+            <!-- test identical text, but variant upper- and lower-case  -->
+            <!-- each appears later in a paragraph, to test them sorting -->
+            <!-- into place to form just three index entries (each with  -->
+            <!-- two cross-references)                                   -->
+            <idx>Cayley graph</idx><idx>cayley graph</idx><idx>CAYLEY GRAPH</idx>
+            <!-- identical @sortby, identical content, should consolidate, -->
+            <!-- so an index entry here plus later, in a paragraph, after  -->
+            <!-- some other index entry                                    -->
+            <idx><h sortby="x"><m>x</m> as a variable</h></idx>
 
             <p>Sage can compute definite integrals.  The output contains the approximate numerical value of the definite integral, followed by an upper bound  of the error in the approximation.</p>
 
@@ -441,14 +462,14 @@ the xsltproc executable.
                 <output>(1.189200623826982, 1.320277913471315e-14)</output>
             </sage>
 
-            <p>Given the Fundamental Theorem, we would find the antiderivative useful.</p>
+            <p>Given the Fundamental Theorem, we would find the antiderivative useful.<idx>Cayley graph</idx><idx><h sortby="x"><m>x</m> as a variable</h></idx></p>
 
             <sage>
                 <input>integral(sin(x)^2, x)</input>
                 <output>1/2*x - 1/4*sin(2*x)</output>
             </sage>
 
-            <p>The same command can be used to employ the antiderivative in the application of the Fundamental Theorem.  Notice that the answer is <em>exact</em> and any further manipulation is likely to be simply producing a numerical approximation.</p>
+            <p>The same command can be used to employ the antiderivative in the application of the Fundamental Theorem.  Notice that the answer is <em>exact</em> and any further manipulation is likely to be simply producing a numerical approximation.<idx>cayley graph</idx></p>
 
             <!-- The "full" type is the default, it is used here only for testing purposes -->
             <sage type="full">
@@ -456,7 +477,7 @@ the xsltproc executable.
                 <output>-1/4*sin(4) + 1</output>
             </sage>
 
-            <p>There are integrals you really do not want to evaluate, or you do not want your reader to evaluate.  A Sage cell can be configured for display purposes only<mdash />you can look but you cannot touch.</p>
+            <p>There are integrals you really do not want to evaluate, or you do not want your reader to evaluate.  A Sage cell can be configured for display purposes only<mdash />you can look but you cannot touch.<idx>CAYLEY GRAPH</idx></p>
 
             <sage type="display">
                 <input>integral(e^(x^2), x)</input>
@@ -465,7 +486,13 @@ the xsltproc executable.
 
             <p>You can give a Sage element a <c>doctest</c><idx>doctest</idx><idx><h>attributes</h><h>doctest</h></idx> attribute, whose value mirrors the optional hash tags used in Sage doctests.  Possible values are <c>random</c>, <c>long time</c>, <c>not implemented</c>, <c>not tested</c>, <c>known bug</c>, <c>absolute</c>, <c>relative</c>, and <c>optional</c>.  The values <c>absolute</c> and <c>relative</c> refer to floating-point tolerances for equality and require a second attribute <c>tolerance</c> to specify a floating point value.  The value <c>optional</c> refers to the test requiring that an optional Sage package be present.  The name of that package should be provided in the <c>package</c> attribute.</p>
 
-            <p>The next cell is marked in the source as <c>doctest="random"</c>, and so is specified as unpredictable and not tested.  But there is some <q>sample</q> output which will appear in the <latex /> version (and always be the same).</p>
+            <!-- The four index entries below once sorted/consolidated very poorly -->
+            <p>The next cell is marked in the source as <c>doctest="random"</c>, and so is specified as unpredictable and not tested.  But there is some <q>sample</q> output which will appear in the <latex /> version (and always be the same).
+            <idx>c</idx>
+            <idx><h sortby="c">A bug test, sorted as <q>c</q></h><h>b</h><h>c one</h></idx>
+            <idx><h sortby="c">A bug test, sorted as <q>c</q></h><h>x</h><h>c two</h></idx>
+            <idx><h sortby="c">A bug test, sorted as <q>c</q></h><h>b</h><h>c three</h></idx>
+            </p>
 
             <sage doctest="random">
                 <input>random()</input>
@@ -542,6 +569,21 @@ the xsltproc executable.
 
             <p>Sage output can sometimes be quite long, though this has improved with some changes in Sage's output routines.  Output code should be included primarily for doctesting purposes, and in this use, you may break at almost whitespace character and the doctesting framework will adjust accordingly.  You may wish to show sample output in a static format, like a PDF, so you can consider formatting your output to fit the width constraints of that medium.  Or you may even adjust exactly what is output, to keep it from being too verbose.  Sage doctesting also allows for a wild-card style syntax which allows you to skip over huge chunks of meaningless or unpredictable output, such as tracebacks on error messages.</p>
 
+            <p>This paragraph is just a placeholder.  It has handful of index entries, all starting with the letters <q>gas</q>, taken from <pubtitle>Indexing for Editors and Authors: A Practical Guide to Understanding Indexes</pubtitle> by Leise, Mertes, and Badgett.  The intent is to test letter-by-letter versus word-by-word sorting of index entries.  We use a word-by-word order, resulting in:<ol>
+                <li>gas</li>
+                <li>gas masks</li>
+                <li>gas production</li>
+                <li>gas works</li>
+                <li>gasoline</li>
+                <li>gastritis</li>
+            </ol>
+            <idx>gasoline</idx>
+            <idx>gas works</idx>
+            <idx>gas</idx>
+            <idx>gas masks</idx>
+            <idx>gas production</idx>
+            <idx>gastritis</idx>
+            </p>
 
             <paragraphs>
                 <title>Titled Sage Cells</title>
@@ -610,7 +652,7 @@ the xsltproc executable.
             <subsection xml:id="subsection-second-FTC">
                 <title>Second Version of <acro>FTC</acro></title>
 
-                <todo>Should equation references come with parentheses?</todo>
+                <!-- ToDo: Should equation references come with parentheses? -->
 
                 <corollary permid="ghI" xml:id="corollary-FTC-derivative">
                     <creator>Leibniz, Newton</creator>
@@ -995,7 +1037,7 @@ the xsltproc executable.
                     <introduction>
                         <p>A set of reading questions may have an <tag>introduction</tag>, perhaps for preparatory explanation.</p>
                         <p>If a student has logged in to the HTML version,
-                           then they can `answer the reading` questions directly in the book.
+                           then they can answer the reading questions directly in the book.
                            Inline math LaTeX can be entered using
                            <c>$</c>...<c>$</c> or <c>\(</c>...<c>\)</c> delimiters,
                            and inline AsciiMath using backticks <c>`</c>...<c>`</c> as delimiters.
@@ -1038,15 +1080,17 @@ the xsltproc executable.
                         <p>A glossary may have an <tag>introduction</tag>, perhaps with some explanation.</p>
                     </introduction>
 
-                    <defined-term>
-                        <title>bar</title>
-                        <p>A part of <term>foobar</term>.  See <xref ref="foobar-defined" text="title"/>.</p>
-                    </defined-term>
+                    <terms>
+                        <defined-term>
+                            <title>bar</title>
+                            <p>A part of <term>foobar</term>.  See <xref ref="foobar-defined" text="title"/>.</p>
+                        </defined-term>
 
-                    <defined-term xml:id="foobar-defined">
-                        <title>foobar</title>
-                        <p>A synonym for the acronym <acro>FUBAR</acro>.</p>
-                    </defined-term>
+                        <defined-term xml:id="foobar-defined">
+                            <title>foobar</title>
+                            <p>A synonym for the acronym <acro>FUBAR</acro>.</p>
+                        </defined-term>
+                    </terms>
 
                     <conclusion>
                         <p>And for symmetry, a <tag>conclusion</tag>.</p>
@@ -1164,6 +1208,25 @@ the xsltproc executable.
                 <subsubsection>
                     <title>Test Two</title>
 
+                    <p>An intervening subsection section which contains an <tag>exercises</tag> division which must at the level of a Subsubsubsection.</p>
+
+                    <exercises>
+                        <exercise>
+                            <statement>
+                                <p>A mock exercise to appease validation.</p>
+                            </statement>
+                        </exercise>
+                        <exercise>
+                            <statement>
+                                <p>And a second to help with formatting the division heading.</p>
+                            </statement>
+                        </exercise>
+                    </exercises>
+                </subsubsection>
+
+                <subsubsection>
+                    <title>Test Three</title>
+
                     <p>An intervening subsubsection just before a conclusion.</p>
                 </subsubsection>
 
@@ -1184,6 +1247,8 @@ the xsltproc executable.
                 <p>If you need a <q>fill-in blank</q>, like this<fillin />, it can be obtained with an empty <tag>fillin</tag> element that defaults to roughly a 10-character width.  You can use the <tag>characters</tag> attribute to make the rule longer or shorter, such as a 40-character blank: <fillin characters="40" />.  The character count is approximate, based on typical character widths within a proportional font carrying English language text.  Adjust to suit, or request a language-specific adjustment if it is critical.</p>
 
                 <p>Long after we started this mess, we added <pretext /> tags to mark up tags and attributes.  The elements are: <tag>tag</tag>, <tag>tage</tag>, <tag>attr</tag>.  Examples of how these render are (respectively): <tag>section</tag>, <tage>hash</tage>, <attr>width</attr>.  Perhaps this document will make greater use of these tags.</p>
+
+                <p>We supply two incomplete cross-references for testing purposes only: <xref provisional="a first incomplete cross-reference"/>, <xref provisional="a second incomplete cross-reference"/>.</p>
             </subsection>
 
             <conclusion>
@@ -1225,6 +1290,7 @@ the xsltproc executable.
 
         <section permid="Bcd">
             <title>Some Facts and Figures</title>
+            <idx>footnotes</idx>
 
             <!-- This is not implemented
             This Sage code will be (a) hidden and (b) automatically executed
@@ -1340,7 +1406,7 @@ the xsltproc executable.
         <section>
             <title>Some Advanced Ideas</title>
 
-            <todo>Move index-finish marker back once it is allowed other places</todo>
+            <!-- TODO: Move index-finish marker back once it is allowed other places -->
 
             <p><idx xml:id="index-finish-multicolumn" start="index-start-multicolumn" />The multi-row displayed mathematics in the proof of the Fundamental Theorem had equations aligned on the equals signs via the &amp; character.  Sometimes you don't want that.  Here is an example with some differential equations, with each equation centered and unnumbered,<md>
                 <mrow>{\mathcal L}(y')(s) = s {\mathcal L}(y)(s) - y(0) = s Y(s) - y(0)</mrow>
@@ -1636,6 +1702,7 @@ the xsltproc executable.
                 <p>Generally, you cannot use any <init>XML</init> elements inside of the mathematics elements.  An exception is the <c>xref</c> element which you might want to use to provide justifications for the steps of a derivation.  Here is a visual example that is mathematically meaningless,<md>
                     <mrow>A&amp;=B+C&amp;&amp;<xref ref="corollary-FTC-derivative" text="type-global" /></mrow>
                     <mrow>&amp;=D+E&amp;&amp;<xref ref="theorem-FTC" text="title" /></mrow>
+                    <mrow>&amp;=F+G&amp;&amp;<xref ref="theorem-number-01" text="title">A nice result</xref></mrow>
                 </md>.</p>
             </subsection>
 
@@ -1922,8 +1989,10 @@ the xsltproc executable.
                          <row>
                             <cell><c>menu</c></cell><cell><icon name="menu"/></cell>
                             <cell><c>wrench</c></cell><cell><icon name="wrench"/></cell>
+                            <cell/><cell/>
                             <!-- <cell><c></c></cell><cell><icon name=""/></cell> -->
                         </row>
+                        <!-- Keep rows full (w/ empty cells) to please HTML validator -->
 
                     </tabular>
                 </table>
@@ -1946,8 +2015,9 @@ the xsltproc executable.
 
             <subsection xml:id="section-urls">
                 <title>URLs, such as <url href="http://example.com" /></title>
-
-                <p>An internet <init>URL</init><idx><h>URLs</h></idx> can contain a limited subset of keyboard characters.  So we include a long <init>URL</init> for testing:  <url href="http://www.pcc.edu/enroll/registration/dropping.html#withdraw">www.pcc.edu/enroll/registration/dropping.html#withdraw</url>.  Notice in the source that you <em>do not</em> put any tags inside the <c>href</c> attribute, but you may need to provide XML escape sequences, see <xref ref="subsection-xml-escape"/>).  Here is a totally bogus <init>URL</init>, which contains every possible legal character, so if this fails to convert there is some problematic character.  Three versions: one with the content as normal text, one with the characters as verbatim text, and then as a <init>URL</init> with the same string of characters as the address and the clickable, viewable part.</p>
+                        <idx><h>link</h><h>external, url</h></idx>
+                        <idx><h>reference</h><h>external, url</h></idx>
+                <p>An internet <init>URL</init><idx><h>URLs</h></idx> can contain a limited subset of keyboard characters.  So we include a long <init>URL</init> for testing:  <url href="http://www.pcc.edu/enroll/registration/dropping.html#withdraw">www.pcc.edu/enroll/registration/dropping.html#withdraw</url>.  Notice in the source that you <em>do not</em> put any tags inside the <c>href</c> attribute, but you may need to provide XML escape sequences, see <xref ref="subsection-xml-escape"/>).  Here is a totally bogus <init>URL</init>, which contains every possible legal character, so if this fails to convert there is some problematic character.  In order to test the use of a percent sign (<c>%</c>) in a URL, we follow it by two hex digits, specifically, <c>58</c>, which is a way to represent the character <c>X</c> in a <init>URL</init>.  Three versions: one with the content as normal text, one with the characters as verbatim text, and then as a <init>URL</init> with the same string of characters as the address and the clickable, viewable part.</p>
 
                 <blockquote>
 
@@ -1955,7 +2025,7 @@ the xsltproc executable.
 
                     <p><c>ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789%-._~:/?#[]@!$&amp;'()*+,;=</c></p>
 
-                    <p><url href="http://example.com/ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789%-._~:/?#[]@!$&amp;'()*+,;=">http://example.com/ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789%-._~:/?#[]@!$&amp;'()*+,;=</url></p>
+                    <p><url href="http://example.com/ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789%58-._~:/?#[]@!$&amp;'()*+,;=">http://example.com/ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789%58-._~:/?#[]@!$&amp;'()*+,;=</url></p>
 
                 </blockquote>
 
@@ -1968,10 +2038,10 @@ the xsltproc executable.
                 <p>When a <c>url</c> has no content, then its <c>href</c> attribute is displayed as the text, automatically in a typewriter font.</p>
 
                 <blockquote>
-                    <p><url href="http://example.com/ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789%-._~:/?#[]@!$&amp;'()*+,;="></url></p>
+                    <p><url href="http://example.com/ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789%58-._~:/?#[]@!$&amp;'()*+,;="></url></p>
                 </blockquote>
 
-                <p>We are not fans of footnotes, they are totally unstructured.<fn><url href="https://en.wikipedia.org/wiki/Carleson%27s_theorem">Carleson's Theorem</url></fn>  A URL in a footnote migrates around, and so care must be taken.<fn><url href="http://example.com/ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789%-._~:/?#[]@!$&amp;'()*+,;="><c>http://example.com/ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789%-._~:/?#[]@!$&amp;'()*+,;=</c></url></fn>  This paragraph has two footnotes, one with a real URL from Jesse Oldroyd, another with a fake URL from the above suite (the fourth one).  For good measure, we repeat the URL found in the first footnote: <url href="https://en.wikipedia.org/wiki/Carleson%27s_theorem">Carleson's Theorem</url>.  And we include a no-content version of the same link:  <url href="https://en.wikipedia.org/wiki/Carleson%27s_theorem" />.</p>
+                <p>We are not fans of footnotes, they are totally unstructured.<fn><url href="https://en.wikipedia.org/wiki/Carleson%27s_theorem">Carleson's Theorem</url></fn>  A URL in a footnote migrates around, and so care must be taken.<fn><url href="http://example.com/ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789%58-._~:/?#[]@!$&amp;'()*+,;="><c>http://example.com/ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789%58-._~:/?#[]@!$&amp;'()*+,;=</c></url></fn>  This paragraph has two footnotes, one with a real URL from Jesse Oldroyd, another with a fake URL from the above suite (the fourth one).  For good measure, we repeat the URL found in the first footnote: <url href="https://en.wikipedia.org/wiki/Carleson%27s_theorem">Carleson's Theorem</url>.  And we include a no-content version of the same link:  <url href="https://en.wikipedia.org/wiki/Carleson%27s_theorem" />.</p>
             </subsection>
 
 
@@ -2081,15 +2151,35 @@ the xsltproc executable.
             <title>Graphics</title>
 
             <introduction>
-                <p>Mathbook XML supports several languages for describing diagrams and pictures with human-readable source code (<ie /> plain text), rather than using a <q>paint</q> program.  Any <latex /> macros used in the rest of your document may be employed in the <latex/>-standalone or Asymptote diagrams (with Sage graphics coming next?).</p>
+                <p>In addition to including images created externally (e.g. photographs),  <pretext/> supports several languages for describing diagrams and pictures with human-readable source code (<ie /> plain text), rather than using a <q>paint</q> program.  This section describes the various methods for incorporationg, or generating, graphis, images or diagrams.</p>
             </introduction>
 
             <subsection>
-                <title><latex /> images</title>
-                <idx><latex /> image</idx>
-                <idx><h>image</h><h><latex /> image</h></idx>
+                <title>Images from External Sources</title>
 
-                <p>There are several graphics engine packages that a <latex /> document can employ. Code from these packages renders diagrams automatically as part of normal processing of <latex /> files.  For HTML output the <c>mbx</c> script produces SVG versions of the pictures.  The script can also produce standalone TEX source files, PDFs, PNGs, and EPSs. The packages should be loaded in <c>docinfo/latex-image-preamble</c>, which is also where global package settings should be made. If any ampersands occur in your <latex/> code you should use the <c>\amp</c> macro pre-defined by <pretext/>. These first examples are from the <url href="http://www.texample.net/tikz/examples/">TeXample.net</url> site.</p>
+                <p>If you have raster images (photographs, etc.) then they are specified with complete filenames, as above in Figure<nbsp /><xref ref="figure-function-derivative"/> or just below.</p>
+
+                <figure>
+                    <caption>New Zealand Landscape, <url href="https://commons.wikimedia.org/wiki/File:NZ_Landscape_from_the_van.jpg"><c>commons.wikimedia.org</c></url><fn><c>https://commons.wikimedia.org/wiki/File:NZ_Landscape_from_the_van.jpg</c></fn>, CC-BY-SA-2.0</caption>
+                    <image source="images/nz-landscape.jpg" width="80%"/>
+                </figure>
+
+                <p>If you have existing images that are vector graphics, then PDF format works best for <latex/> output and SVG format works best for HTML.  The utility <c>pdf2svg</c> works well for converting PDF to SVG.  In this case, specify your source as a filename, but leave off the file extension, and the appropriate version will be used for the current output format.</p>
+
+                <p>The image below is provided from a PDF file in <latex/> output, and was converted to an SVG for use with the HTML output.  It has been explicitly scaled to a width of 65% of the text width.</p>
+
+                <figure xml:id="figure-complete-graph">
+                    <caption>Complete graph on <m>16</m> vertices, from <c>www.texample.net</c></caption>
+                    <image source="images/complete-graph" width="65%"/>
+                </figure>
+            </subsection>
+
+            <subsection>
+                <title><latex/> images</title>
+                <idx><latex/> image</idx>
+                <idx><h>image</h><h><latex/> image</h></idx>
+
+                <p>There are several graphics engine packages that a <latex/> document can employ. Code from these packages renders diagrams automatically as part of normal processing of <latex/> files.  For HTML output the <c>mbx</c> script produces SVG versions of the pictures.  The script can also produce standalone <tex/> source files, PDFs, PNGs, and EPSs. The packages should be loaded in <c>docinfo/latex-image-preamble</c>, which is also where global package settings should be made. If any ampersands occur in your <latex/> code you should use the <c>\amp</c> macro pre-defined by <pretext/>. These first examples are from the <url href="http://www.texample.net/tikz/examples/">TeXample.net</url> site.  Note that any <latex /> macros used in the rest of your document may be employed in the <latex/>-standalone or Asymptote diagrams (with this feature coming to Sage graphics next?).</p>
 
                 <!-- http://www.texample.net/media/tikz/examples/TEX/noise-shaper.tex -->
                 <figure xml:id="figure-tikz-electronics">
@@ -2345,17 +2435,6 @@ the xsltproc executable.
             </subsection>
 
             <subsection>
-                <title>Placing Images without a Caption</title>
-
-                <p>To place an image without a caption, use the <tag>sidebyside</tag> layout element, containing just a single <tag>image</tag>.  There is no way to add a caption, and the item will not be numbered.  You cannot cross-reference it, nor will it appear in a knowl in HTML output.  You will get a bit of vertical separation for the transitions to/from horizontal layout.  Use <c>margins=auto</c> on the <tag>sidebyside</tag> to center the image<mdash />this should become the default behavior.  A variety of other elements may be placed in a similar manner.  See Section<nbsp /><xref ref="section-side-by-side" /> to learn more about the <tag>sidebyside</tag> layout element.</p>
-
-                <sidebyside width="30%" margins="auto">
-                    <image xml:id="cross-square" source="images/cross-square.png"/>
-                </sidebyside>
-
-            </subsection>
-
-            <subsection>
                 <title>Asymptote</title>
 
                 <p>The Asymptote<idx><h>asymptote graphics language</h></idx> graphics language may be placed in your source to draw graphs, diagrams or pictures.  Rules for formatting code are identical to those for Sage code.  For more on Asymptote see <url href="http://asymptote.sourceforge.net/" />.</p>
@@ -2505,6 +2584,48 @@ the xsltproc executable.
             </subsection>
 
             <subsection>
+                <title>Asymptote + threejs 3D</title>
+
+                <p>At this writing (2019-05-16) the Asymptote project plans to soon produce output that is interactive via the Javascript library <c>threejs</c> (see <xref ref="figure-threejs-splines" text="type-global"/>).  The following sneak-peek is courtesy of John Bowman, and uses the <tag>interactive</tag> framework (see <xref ref="section-interactive-authored" text="type-global"/>).  (In particular, the static PDF version is likely to have an option to withhold the QR code?)  We will endeavor to make it even more straight-forward for authors to employ.</p>
+
+                <figure>
+                    <caption>Asymptote Bezier patch</caption>
+                    <interactive xml:id="interactive-asymptote-threejs" platform="javascript" width="80%" aspect="1:1" preview="images/asymptote-bezier-patch.png" source="http://www.math.ualberta.ca/~bowman/gl-matrix-min-2.3.2.js https://cdn.rawgit.com/humbletim/glm-js/31fd034b/build/glm-js.min.js https://code.jquery.com/jquery-3.3.1.min.js http://www.math.ualberta.ca/~bowman/extlibs/pako.js http://www.math.ualberta.ca/~bowman/src/v3d.js http://www.math.ualberta.ca/~bowman/src/arcball.js http://www.math.ualberta.ca/~bowman/data.js http://www.math.ualberta.ca/~bowman/src/gl.js code/asymptote/bezier-patch.js">
+
+                        <slate xml:id="bezierpatch" surface="canvas" aspect="1:1"/>
+
+                        <!-- Holds "script" tags of a very special type (threejs shaders) -->
+                        <!-- So we use zero height, and have HTML contents                -->
+                        <slate surface="html" aspect="1:0">
+                           <script id="shader-fs" type="x-shader/x-fragment">
+                                precision mediump float;
+                                varying vec4 vColor;
+                                void main(void)
+                                {
+                                    gl_FragColor=vColor;
+                                }
+                            </script>
+
+                            <script id="shader-vs" type="x-shader/x-vertex">
+                                attribute vec3 aVertexPosition;
+                                attribute vec4 aVertexColor;
+
+                                uniform mat4 uMMatrix;
+                                uniform mat4 uPMatrix;
+                                uniform mat4 uVMatrix;
+
+                                varying vec4 vColor;
+                                void main(void)
+                                {
+                                    gl_Position=uPMatrix*uVMatrix*uMMatrix*vec4(aVertexPosition,1.0);
+                                    vColor=aVertexColor;
+                                }
+                            </script>
+                        </slate>
+                    </interactive>
+                </figure>
+            </subsection>
+            <subsection>
                 <title>Sage Plots</title>
                 <idx><h>Sage plots</h></idx>
 
@@ -2532,6 +2653,18 @@ the xsltproc executable.
                         up = plot(f, (x, -1.5, 1.5), color='blue', thickness=2)
                         down = plot(g, (x, -1.5, 1.5), color='red', thickness=2)
                         up + down
+                        </sageplot>
+                    </image>
+                </figure>
+
+                <p>Sage code comprised of just a single line was once mishandled, leading to <em>no ouput</em>.  From Jean-Sébastien Turcotte we have the example that revealed the problem.</p>
+
+                <figure xml:id="figure-sage-exosagevec1">
+                    <caption>Les vecteurs <m>\vec{u}</m> et <m>\vec{v}</m></caption>
+                    <image width="25%" xml:id="sageplot-exosagevec1">
+                        <description>Les vecteurs <m>\vec{u}</m> et <m>\vec{v}</m>sont tracés tel que demandé, respectivement en rouge et en bleu.</description>
+                        <sageplot>
+                        plot(vector([-1,2]),color='red')+plot(vector([2,1]),color='blue')
                         </sageplot>
                     </image>
                 </figure>
@@ -2596,22 +2729,9 @@ the xsltproc executable.
             </subsection>
 
             <subsection>
-                <title>Images from External Sources</title>
-
-                <p>If you have raster images (photographs, etc) then they are specified with complete filenames, as above in Figure<nbsp /><xref ref="figure-function-derivative" />.  If you have existing images that are vector graphics, then PDF format works best for <latex /> output and SVG format works best for HTML.  The utility <c>pdf2svg</c> works well for converting PDF to SVG.  In this case, specify your source as a filenmae, but leave off the file extension, and the appropriate version will be used for the current output format.</p>
-
-                <p>The image below is provided from a PDF file for the <latex /> output, and was converted to an SVG for use with th HTML output.</p>
-
-                <figure xml:id="figure-complete-graph">
-                    <caption>Complete graph on <m>16</m> vertices, from <c>www.texample.net</c></caption>
-                    <image source="images/complete-graph" width="65%"/>
-                </figure>
-            </subsection>
-
-            <subsection>
                 <title>Copies of Images</title>
 
-                <p>Sometimes you want to use the same image more than once.  For a raster image, you can just point to it again.  You are free to wrap it in a <c>figure</c> or <c>sidebyside</c> and change the caption.  It will get a new number as a new figure, and you will need to assign a unique <c>@xml:id</c> attribute.  Maybe appending <c>-copy-2</c>, or similar, will be helpful.</p>
+                <p>Sometimes you want to use the same image more than once.  For a raster image, you can just point to it again.  You are free to wrap it in a <c>figure</c> and thus change the caption.  It will get a new number as a new figure, and you will need to assign a unique <attr>xml:id</attr> attribute.  Maybe appending <c>-copy-2</c>, or similar, to the <attr>xml:id</attr> will be helpful.</p>
 
                 <figure xml:id="figure-raster-image-copy">
                     <caption>Copy of raster image, in a figure, so now numbered and captioned</caption>
@@ -2619,6 +2739,195 @@ the xsltproc executable.
                 </figure>
 
                 <p>If you have a figure generated from source code (such as in TikZ) you can place the code into a file and <c>xinclude</c> it twice.  The <c>mbx</c> script will make two copies if you include the source twice, but with different names (generated from the different <c>@xml:id</c>).  Furthermore, with the <c>@parse</c> attribute on the <c>xinclude</c> element set to <c>text</c> you are absolved from escaping the dangerous XML characters (see <xref ref="subsection-xml-escape" text="type-global"/>) and definitely have no need for the often mis-understood <c>CDATA</c> mechanism.  We demonstrate this with the sample book, since it is all set up with the <c>xinclude</c> mechanism.  See the two plots of the 8-th roots of unity in the complex numbers section of the chapter on cyclic groups.</p>
+            </subsection>
+
+            <subsection>
+                <title>Caption Testing</title>
+
+                <p>A caption could be as substantial as a paragraph, here we test out one such example.</p>
+
+                <figure xml:id="figure-long-caption">
+                    <caption>A caption can be a whole paragraph with lots of technical details, and maybe a hyperlink to something external, such as <url href="https://pretextbook.org"><c>pretextbook.org</c></url>.  There could be some inline mathematics, such as <m>x^2 + y^2 = c^2</m>.  Would a knowl open here?  Recursively?  Let's see: <xref ref="figure-long-caption" />.  Display mathematics, side-by-sides, theorems, and lots of other things should be banned.  Footnotes sound like a bad idea.  Strange characters should be fine: <section-mark />.</caption>
+
+                    <image source="images/cross-square.png" width="20%" />
+                </figure>
+            </subsection>
+
+            <subsection xml:id="captionless-images">
+                <title>Captionless Images</title>
+
+                <p>We strongly suggest placing images within a <tag>figure</tag>, as we have done above, so that you can reference them, and use the (required) <tag>caption</tag> to explain what they are.  However there are places, such as a <tag>preface</tag>, where numbered itmes are not permitted.  So you might want a solo image there.  Or maybe graphics are an illustration of sorts, and a numbered figure feels like overkill.  Or it is part of an <tag>exercise</tag> or <tag>proof</tag> of a <tag>theorem</tag>. But notice that you cannot then use this image as the target of a cross-reference, so you may need to refer to some enclosing container.</p>
+
+                <p>The image can be scaled by specifying the <attr>width</attr> as a percentage, including the percent-sign (%).  The height is scaled to preserve the aspect ratio.  There is no facility to change the height, it is your responsibility to manage the aspect ratio independently.  The <attr>margins</attr> can be given as a pair of percentages, separated by a space.  The <attr>width</attr> defaults to 100%, while <attr>margins</attr> defaults to the value <c>auto</c>, which will center the image.  Missing values are computed sensibly, and there is robust error-checking.  The layout control here is a subset of what is available for the more elaborate <tag>sidebyside</tag> element, see <xref ref="section-side-by-side" text="type-global"/>.</p>
+
+                <p>Two simple examples. The first has width <c>10%</c> and so defaults to being centered, and the second has width <c>10%</c> and left margin of <c>25%</c>.</p>
+
+                <image source="images/cross-square.png" width="10%"/>
+
+                <p>A paragraph, just to show where the first stops and the second ends.</p>
+
+                <image source="images/cross-square.png" width="10%" margins="25% 65%"/>
+
+                <p>You might wish to place a single image flush-left, or flush-right.  You can specify the <c>margins</c> attribute as a pair of percentages for different left and right margins.  The following are laid out with two margins, with a 0% left margin and right margin (respectively). </p>
+
+                <image source="images/cross-square.png" width="10%" margins="0% 90%"/>
+
+                <image source="images/cross-square.png" width="10%" margins="90% 0%"/>
+
+                <p>We place two images right above one another, to test spacing of consecutive images (provided they stay on the same page!).</p>
+
+                <image source="images/cross-square.png" width="10%" margins="10% 80%"/>
+
+                <image source="images/cross-square.png" width="10%" margins="10% 80%"/>
+
+                <paragraphs>
+                    <title>Testing (2019-06-02)</title>
+
+                    <p>All the images above are specified by filenames.  We need to test how various options behave when incorporated into the (new) implementation for images, being introduced with solo images.</p>
+
+                    <p>A <c>tikz</c> image recycled from above, now 40% width, with 40% left margin, 20% right margin.</p>
+
+                    <image xml:id="tikz-cone-solo" width="40%" margins="40% 20%">
+                        <latex-image>
+                        <!-- CDATA prevents certain LaTeX code from being interpreted as xml -->
+                        <![CDATA[\begin{tikzpicture}[join=round]
+                        \tikzstyle{conefill} = [fill=blue!20,fill opacity=0.8]
+                        \tikzstyle{ann} = [fill=white,font=\footnotesize,inner sep=1pt]
+                        \tikzstyle{ghostfill} = [fill=white]
+                             \tikzstyle{ghostdraw} = [draw=black!50]
+                        \filldraw[conefill](-.775,1.922)--(-1.162,.283)--(-.274,.5)
+                                            --(-.183,2.067)--cycle;
+                        \filldraw[conefill](-.183,2.067)--(-.274,.5)--(.775,.424)
+                                            --(.516,2.016)--cycle;
+                        \filldraw[conefill](.516,2.016)--(.775,.424)--(1.369,.1)
+                                            --(.913,1.8)--cycle;
+                        \filldraw[conefill](-.913,1.667)--(-1.369,-.1)--(-1.162,.283)
+                                            --(-.775,1.922)--cycle;
+                        \draw(1.461,.107)--(1.734,.127);
+                        \draw[arrows=<->](1.643,1.853)--(1.643,.12);
+                        \filldraw[conefill](.913,1.8)--(1.369,.1)--(1.162,-.283)
+                                            --(.775,1.545)--cycle;
+                        \draw[arrows=->,line width=.4pt](.274,-.5)--(0,0)--(0,2.86);
+                        \draw[arrows=-,line width=.4pt](0,0)--(-1.369,-.1);
+                        \draw[arrows=->,line width=.4pt](-1.369,-.1)--(-2.1,-.153);
+                        \filldraw[conefill](-.516,1.45)--(-.775,-.424)--(-1.369,-.1)
+                                            --(-.913,1.667)--cycle;
+                        \draw(-1.369,.073)--(-1.369,2.76);
+                        \draw(1.004,1.807)--(1.734,1.86);
+                        \filldraw[conefill](.775,1.545)--(1.162,-.283)--(.274,-.5)
+                                            --(.183,1.4)--cycle;
+                        \draw[arrows=<->](0,2.34)--(-.913,2.273);
+                        \draw(-.913,1.84)--(-.913,2.447);
+                        \draw[arrows=<->](0,2.687)--(-1.369,2.587);
+                        \filldraw[conefill](.183,1.4)--(.274,-.5)--(-.775,-.424)
+                                            --(-.516,1.45)--cycle;
+                        \draw[arrows=<-,line width=.4pt](.42,-.767)--(.274,-.5);
+                        \node[ann] at (-.456,2.307) {$r_0$};
+                        \node[ann] at (-.685,2.637) {$r_1$};
+                        \node[ann] at (1.643,.987) {$h$};
+                        \path (.42,-.767) node[below] {$x$}
+                            (0,2.86) node[above] {$y$}
+                            (-2.1,-.153) node[left] {$z$};
+                        % Second version of the cone
+                        \begin{scope}[xshift=3.5cm]
+                        \filldraw[ghostdraw,ghostfill](-.775,1.922)--(-1.162,.283)--(-.274,.5)
+                                                       --(-.183,2.067)--cycle;
+                        \filldraw[ghostdraw,ghostfill](-.183,2.067)--(-.274,.5)--(.775,.424)
+                                                       --(.516,2.016)--cycle;
+                        \filldraw[ghostdraw,ghostfill](.516,2.016)--(.775,.424)--(1.369,.1)
+                                                       --(.913,1.8)--cycle;
+                        \filldraw[ghostdraw,ghostfill](-.913,1.667)--(-1.369,-.1)--(-1.162,.283)
+                                                       --(-.775,1.922)--cycle;
+                        \filldraw[ghostdraw,ghostfill](.913,1.8)--(1.369,.1)--(1.162,-.283)
+                                                       --(.775,1.545)--cycle;
+                        \filldraw[ghostdraw,ghostfill](-.516,1.45)--(-.775,-.424)--(-1.369,-.1)
+                                                       --(-.913,1.667)--cycle;
+                        \filldraw[ghostdraw,ghostfill](.775,1.545)--(1.162,-.283)--(.274,-.5)
+                                                       --(.183,1.4)--cycle;
+                        \filldraw[fill=red,fill opacity=0.5](-.516,1.45)--(-.775,-.424)--(.274,-.5)
+                                                             --(.183,1.4)--cycle;
+                        \fill(-.775,-.424) circle (2pt);
+                        \fill(.274,-.5) circle (2pt);
+                        \fill(-.516,1.45) circle (2pt);
+                        \fill(.183,1.4) circle (2pt);
+                        \path[font=\footnotesize]
+                                (.913,1.8) node[right] {$i\hbox{$=$}0$}
+                                (1.369,.1) node[right] {$i\hbox{$=$}1$};
+                        \path[font=\footnotesize]
+                                (-.645,.513) node[left] {$j$}
+                                (.228,.45) node[right] {$j\hbox{$+$}1$};
+                        \draw (-.209,.482)+(-60:.25) [yscale=1.3,->] arc(-60:240:.25);
+                        \fill[black,font=\footnotesize]
+                                        (-.516,1.45) node [above] {$P_{00}$}
+                                        (-.775,-.424) node [below] {$P_{10}$}
+                                        (.183,1.4) node [above] {$P_{01}$}
+                                        (.274,-.5) node [below] {$P_{11}$};
+                        \end{scope}
+                        \end{tikzpicture}]]>
+                        </latex-image>
+                    </image>
+
+                    <p>A <c>pgfplot</c> image recycled from above, now 20% width, with 40% left margin, 40% right margin, and no longer legible.</p>
+
+                    <image xml:id="pgfplots-data-demo-solo" width="20%" margins="40% 40%">
+                        <latex-image>
+                        <!-- CDATA prevents certain LaTeX code from being interpreted as xml -->
+                        <![CDATA[\tikzset{%
+                        }
+                        \begin{tikzpicture}
+                        \begin{axis}[
+                            xmin=0,xmax=100,ymin=-20,ymax=100,
+                            ytick={-20,0,...,100},
+                            xlabel={time (ms)},
+                            ylabel={potential (V)},
+                        ]
+                        \addplot[blue] table {data/hodgkin-huxley-data.dat};
+                        \end{axis}
+                        \end{tikzpicture}]]>
+                        </latex-image>
+                    </image>
+
+
+                    <p>An Asymptote image, with zero layout control, so 100% width.</p>
+
+                    <image xml:id="asymptote-lever-solo">
+                        <description>Moments on a lever</description>
+                        <asymptote>
+                        size(200,0);
+
+                        pair z0=(0,0);
+                        pair z1=(2,0);
+                        pair z2=(5,0);
+                        pair zf=z1+0.75*(z2-z1);
+
+                        draw(z1--z2);
+                        dot(z1,red+0.15cm);
+                        dot(z2,darkgreen+0.3cm);
+                        label("$m$",z1,1.2N,red);
+                        label("$M$",z2,1.5N,darkgreen);
+                        label("$\hat{\ }$",zf,0.2*S,fontsize(24pt)+blue);
+
+                        pair s=-0.2*I;
+                        draw("$x$",z0+s--z1+s,N,red,Arrows,Bars,PenMargins);
+
+                        s=-0.5*I;
+                        draw("$\bar{x}$",z0+s--zf+s,blue,Arrows,Bars,PenMargins);
+
+                        s=-0.95*I;
+                        draw("$X$",z0+s--z2+s,darkgreen,Arrows,Bars,PenMargins);
+                        </asymptote>
+                    </image>
+
+                    <p>A Sage example, pushed to the right margin.</p>
+
+                    <image xml:id="sageplot-parabola-solo" width="30%" margins="70% 0%">
+                        <description>A standard parabola on the interval [-2,4]</description>
+                        <sageplot>
+                        f(x) = x^2
+                        plot(f, (x, -2, 4), color='green', thickness=3)
+                        </sageplot>
+                    </image>
+                </paragraphs>
             </subsection>
 
             <subsection>
@@ -2681,18 +2990,6 @@ the xsltproc executable.
                 </sidebyside>
 
                 <p>In the early stages of a writing project, it may be best not to track provisional image files built with <c>mbx</c> under version control, and just regenerate them periodically (see the <c>-r</c> option for <c>mbx</c>).  As a project matures, then it makes sense to put stable files under version control for collaborators and others.  In every case, managing graphics files (and other aspects of production), is much more pleasurable with a script (shell, Makefile, etc.)</p>
-            </subsection>
-
-            <subsection>
-                <title>Caption Testing</title>
-
-                <p>A caption could be as substantial as a paragraph, here we test out one such example.</p>
-
-                <figure xml:id="figure-long-caption">
-                    <caption>A caption can be a whole paragraph with lots of technical details, and maybe a hyperlink to something external, such as <url href="https://pretextbook.org"><c>pretextbook.org</c></url>.  There could be some inline mathematics, such as <m>x^2 + y^2 = c^2</m>.  Would a knowl open here?  Recursively?  Let's see: <xref ref="figure-long-caption" />.  Display mathematics, side-by-sides, theorems, and lots of other things should be banned.  Footnotes sound like a bad idea.  Strange characters should be fine: <section-mark />.</caption>
-
-                    <image source="images/cross-square.png" width="20%" />
-                </figure>
             </subsection>
         </section>
 
@@ -3885,8 +4182,8 @@ the xsltproc executable.
                     <row valign="top" bottom="medium">
                         <cell>Unit</cell>
                         <cell>Stands For</cell>
-                        <cell >Defininion</cell>
-                        <cell >Roughly</cell>
+                        <cell>Definition</cell>
+                        <cell>Roughly</cell>
                     </row>
                     <row valign="top" bottom="minor">
                         <cell><quantity><unit base="second"/></quantity></cell>
@@ -3925,6 +4222,7 @@ the xsltproc executable.
                         <cell>
                              <line>I am the Lorax.</line>
                              <line>I speak for the trees.</line>
+                             <line>Self-referential: <xref ref="table-multiline-cells" text="type-global"/></line>
                         </cell>
                         <cell>
                              <line>Look at me!</line>
@@ -4042,7 +4340,7 @@ the xsltproc executable.
                 </sidebyside>
             </figure>
 
-            <p>Tables are formed in <latex /> output with copious use of the <c>\multicolumn</c> macro to override more global alignment settings, and to spread the content of one cell across several columns.  However, sometimes <latex />'s special characters have behaved badly in this situation.  So the table below, two items per row, is just designed for <latex /> testing.  But of course, it should still render fine in other formats.  The three test cases are from <xref ref="section-urls" />, but without 50 alphabetic characters and 8 digits, which should not be problems in this context.  The first column's entries are <em>forced</em> to be wrapped in a <c>\multicolumn</c> by specifying their horizontal alignment.  The second column's entries <em>will not</em> be wrapped in a <c>\multicolumn</c>.So the two columns will look identical, other than the first having a left alignment, and the second has the default center alignment.  (This table is known to render poorly in a Jupyter notebook.  The cause is four dollar signs present in rows 1 and 3, and is explained in <xref ref="subsection-jupyter-dollars" text="type-global"/>.)</p>
+            <p>Tables are formed in <latex /> output with copious use of the <c>\multicolumn</c> macro to override more global alignment settings, and to spread the content of one cell across several columns.  However, sometimes <latex />'s special characters have behaved badly in this situation.  So the table below, two items per row, is just designed for <latex /> testing.  But of course, it should still render fine in other formats.  The three test cases are from <xref ref="section-urls" />, but without 50 alphabetic characters and 8 digits, which should not be problems in this context.  In order to test the use of a percent sign (<c>%</c>) in a URL, we follow it by two hex digits, specifically, <c>58</c>, which is a way to represent the character <c>X</c> in a <init>URL</init>.  The first column's entries are <em>forced</em> to be wrapped in a <c>\multicolumn</c> by specifying their horizontal alignment.  The second column's entries <em>will not</em> be wrapped in a <c>\multicolumn</c>.So the two columns will look identical, other than the first having a left alignment, and the second has the default center alignment.  (This table is known to render poorly in a Jupyter notebook.  The cause is four dollar signs present in rows 1 and 3, and is explained in <xref ref="subsection-jupyter-dollars" text="type-global"/>.)</p>
 
             <table xml:id="table-latex-problems">
                 <caption>Problematic Table Cells for <latex /></caption>
@@ -4055,14 +4353,14 @@ the xsltproc executable.
 
                     <row>
                         <cell>2</cell>
-                        <cell halign="left"><url href="http://example.com/09az%-._~:/?#[]@!$&amp;'()*+,;=">http://example.com/09az%-._~:/?#[]@!$&amp;'()*+,;=</url></cell>
-                        <cell><url href="http://example.com/09az%-._~:/?#[]@!$&amp;'()*+,;=">http://example.com/09az%-._~:/?#[]@!$&amp;'()*+,;=</url></cell>
+                        <cell halign="left"><url href="http://example.com/09az%58-._~:/?#[]@!$&amp;'()*+,;=">http://example.com/09az%58-._~:/?#[]@!$&amp;'()*+,;=</url></cell>
+                        <cell><url href="http://example.com/09az%58-._~:/?#[]@!$&amp;'()*+,;=">http://example.com/09az%58-._~:/?#[]@!$&amp;'()*+,;=</url></cell>
                     </row>
 
                     <row>
                         <cell>3</cell>
-                        <cell halign="left"><url href="http://example.com/09az%-._~:/?#[]@!$&amp;'()*+,;="></url></cell>
-                        <cell><url href="http://example.com/09az%-._~:/?#[]@!$&amp;'()*+,;="></url></cell>
+                        <cell halign="left"><url href="http://example.com/09az%58-._~:/?#[]@!$&amp;'()*+,;="></url></cell>
+                        <cell><url href="http://example.com/09az%58-._~:/?#[]@!$&amp;'()*+,;="></url></cell>
                     </row>
                 </tabular>
             </table>
@@ -4158,6 +4456,28 @@ the xsltproc executable.
                         <instructions>
                             <p>Parameters <m>a</m>, <m>b</m>, <m>d</m>, and <m>e</m>, form a <m>2\times 2</m> matrix <m>A</m>, while <m>c</m> and <m>f</m> form a vector <m>\vec{b}</m>.  The two views of Woody shows the effect of the mapping <me>\vec{x}\mapsto A\vec{x} + \vec{b}</me>.</p>
                         </instructions>
+                    </interactive>
+                </figure>
+
+                <p>The following example was contributed by Rick Roesler. The <tag>figure</tag> is comprised of four <tag>stack</tag> elements within a <tag>sidebyside</tag>. By varying the time in the top box, the reader can observe the displacement, velocity, and acceleration of a ball thrown upward with an initial velocity of 30 m/s.</p>
+
+                <figure>
+                    <caption>1-Dimensional Kinematics</caption>
+                    <interactive xml:id="kinematics" platform="jsxgraph" aspect="6:7" source="code/roesler/kinematics.js">
+                        <sidebyside width="70%" margins="15%">
+                            <stack>
+                                <slate xml:id="box_t" surface="jsxboard" aspect="6:1" />
+                                <slate xml:id="box_s" surface="jsxboard" aspect="6:3" />
+                                <slate xml:id="box_v" surface="jsxboard" aspect="6:3" />
+                                <slate xml:id="box_a" surface="jsxboard" aspect="6:3" />
+                            </stack>
+                        </sidebyside>
+                        <instructions>
+                            <p>Use the time slider in the top panel to vary the time from 0 sec to 6 sec. Observe how the displacement, velocity, and acceleration vary with time.</p>
+                        </instructions>
+                        <static>
+                            <image source="images/kinematics.png" width="60%"/>
+                        </static>
                     </interactive>
                 </figure>
 
@@ -4453,39 +4773,110 @@ the xsltproc executable.
             <subsection>
                 <title>Geogebra</title>
 
-                <p>Better than using the server version of Geogebra might be designing your own material, retaining your copyright, and using one of Geogebra's <q>Apps</q> to embed the material in your document.  (But note, use of the App comes with licensing restrictions.)  <pretext /> will handle the technical details for you.<ol>
-                    <li>Use Geogebra to make a material.  Maybe you need to install a desktop program that allows you to do this.  Then export, or otherwise discover the <q>base64-encoded</q> version which may be identified by <c>ggb</c>.  See the source of this page for examples of what this looks like.</li>
-                    <li>Mimic the source of the examples below.</li>
-                    <li>Long-run it will be better to park these strings in files (in a <c>code</c> subdirectory?) and <tag>xi:include</tag> them with the <attr>parse</attr> attribute set to <c>text</c>.  But we do not want to impede a newcomer's quickstart with the problematic <c>-xinclude</c> switch.</li>
+                <p>To embed a GeoGebra applet as-is from GeoGebra's Classroom Resources site (by material ID), see <xref ref="subsection-geogebra-server" text="type-global"/>. To design your own applet (either from scratch, or modifying something that already exists in one of those three forms) you may use one of Geogebra's <q>Apps</q> to embed the material in your document. (But note, use of the App comes with licensing restrictions.) <pretext /> will handle most of the technical details for you.</p>
+
+                <p>Do one of the following:<ol>
+                    <li>Identify a material ID from GeoGebra's Classroom Resources site. You might even make the material yourself on that site.</li>
+                    <li>Obtain a <c>.ggb</c> file from GeoGebra. You might construct something on a desktop installation of GeoGebra and save it. If you have a base64-encoded string for a GeoGebra applet, but you don't have a <c>.ggb</c> file, you can decode the string and save the result. For example, at <url href="https://www.opinionatedgeek.com/codecs/base64decoder">www.opinionatedgeek.com/codecs/base64decoder</url>.</li>
+                    <li>Obtain a base64 encoded string for a GeoGebra applet. You might first open a <c>.ggb</c> file in a desktop installation of GeoGebra, and push ctrl-shift-B (command-shift-B on a Mac) and then the string will be in your clipboard.</li>
+                    <li>None of the above, with the intention to make an applet from scratch.</li>
                 </ol></p>
 
-                <p>The sliders on the next applet seem to be at fixed locations.  Make it too skinny and you will never see them, rendering the material useless.  However the window will pan (drag with a mouse) and zoom (scroll wheel of a mouse), so you can adjust that way.</p>
+                <p>Then mimic the examples that follow, using GeoGebra API commands documented at <url href="https://wiki.geogebra.org/en/Reference:GeoGebra_Apps_API">wiki.geogebra.org/en/Reference:GeoGebra_Apps_API</url>, but do not include the <c>ggbApplet.</c> or <c>applet.</c> used in examples to prefix the functions<emdash/>that part of the code will be provided automatically by <pretext/>.</p>
+
+                <p>Jack Green created an applet on the Classroom Resources site with ID <c>D4s2v4ft</c>, which you may view at <url href="https://www.geogebra.org/m/D4s2v4ft">geogebra.org/m/D4s2v4ft</url>. Suppose you would like to use this in your project, but change something about it. We will change something trivial, making the <m>y</m>-axis ticks be separated <m>5</m> apart instead of <m>10</m> apart. We also decide we want a different aspect ratio and overall width. One gotcha: the original applet is loaded and then <pretext/> uses <attr>width</attr> and <attr>aspect</attr> attributes to resize the viewing window using the top left corner as an anchor. This does not rescale axes and that may leave you with important elements missing from the viewing window. So here we reset the viewing window to return to values that are in the original. Lastly, we disable zooming, which is not helpful for this applet. To do each of these things, we rely on the GeoGebra API manual at <url href="https://wiki.geogebra.org/en/Reference:GeoGebra_Apps_API">wiki.geogebra.org/en/Reference:GeoGebra_Apps_API</url>. It is important to use one command per line.</p>
 
                 <figure>
-                    <caption>GeoGebra: astroids (from Dave Rosoff)</caption>
+                    <caption>GeoGebra: modified material ID</caption>
+                    <interactive xml:id="geogebra-train-distance" platform="geogebra" width="75%" aspect="2:1">
+                        <slate xml:id="train-distance" surface="geogebra" material="D4s2v4ft" aspect="2:1">
+                            setAxisSteps(1, 1, 5, 1);
+                            setCoordSystem(-0.7, 8, -6, 56);
+                            enableShiftDragZoom(false);
+                        </slate>
+                    </interactive>
+                </figure>
+
+                <p>The same can be done with a <c>.ggb</c> file. Here we use two provided by David Rosoff, and one provided by Tevian Dray. The path to the file needs to be relative. We modify David's applet in a few ways. Remove the modifications to see the original.</p>
+
+                <figure>
+                    <caption>GeoGebra: modified from <c>.ggb</c> file</caption>
                     <interactive xml:id="geogebra-astroid" platform="geogebra" width="100%" aspect="4:3">
-                        <slate xml:id="astroid" surface="geogebra" source="code/rosoff/astroid.ggb" aspect="4:3" />
+                        <slate xml:id="astroid" surface="geogebra" source="code/rosoff/astroid.ggb" aspect="4:3">
+                            setCoordSystem(-6, 10, -6, 6);
+                            setLabelVisible("b", false);
+                            setLabelVisible("c", false);
+                            setLabelVisible("d", false);
+                            setAxisLabels(1,"x","y","z");
+                            evalCommand("r = Slider(1,4,0.1)");
+                            showResetIcon(true);
+                        </slate>
                     </interactive>
                 </figure>
-
-                <p>Now the controls are in the upper-left corner, so we can more easily make the window a little smaller.  Pan and zoom to put the action where you can see it better.</p>
 
                 <figure>
-                    <caption>GeoGebra: cycloids (from Dave Rosoff)</caption>
-                    <interactive xml:id="geogebra-cycloid" platform="geogebra" width="75%" aspect="3:4">
-                        <slate xml:id="cycloid" surface="geogebra" source="code/rosoff/epi-hypocycloids-default.ggb" aspect="3:4"/>
+                    <caption>GeoGebra: modified from <c>.ggb</c> file</caption>
+                    <interactive xml:id="geogebra-cycloid" platform="geogebra" width="100%" aspect="2:1">
+                        <slate xml:id="cycloid" surface="geogebra" source="code/rosoff/epi-hypocycloids-default.ggb" aspect="2:1">
+                            setCoordSystem(-15,5,-5,5);
+                            setAnimating("θ", true);
+                        </slate>
                     </interactive>
                 </figure>
 
-                <p>You will need to zoom out a bit, and then pan over some, to see all the pieces of the next GeoGebra material.</p>
+                <p>In this one provided by Tevian Dray, we make no modifications (except for those imposed by the scaling). You will need to zoom out a bit, and then pan over some, to see all the pieces.</p>
 
                 <figure>
                     <caption>GeoGebra: a constructive <q>proof</q> that SAS congruence holds in Euclidean geometry (from Tevian Dray)</caption>
                     <interactive xml:id="geogebra-SAS" platform="geogebra" width="100%" aspect="1:1">
-                        <slate xml:id="SAS" surface="geogebra" source="code/dray/SAS.ggb" />
+                        <slate xml:id="SAS" surface="geogebra" source="code/dray/SAS.ggb" aspect="1:1"/>
                         <instructions>
                             <p>Drag some of the points and some of the circles to change them, and watch the remainder react.</p>
                         </instructions>
+                    </interactive>
+                </figure>
+
+                <p>You could also use a base64-encoded string of the <c>.ggb</c> file. You might come across such a string somewhere, or you might generate one by opening a <c>.ggb</c> file in a desktop installation of GeoGebra, and pushing ctrl-shift-B (command-shift-B on a Mac) to get the string in your clipboard. If you do this, you could use a <attr>base64</attr> attribute in place of the <attr>source</attr> attribute in the previous example. We don't do that here because such a string is generally over 5000 characters long and we are keeping the sample article source a bit cleaner.</p>
+
+                <p>Lastly, you may just wish to build something from scratch using GeoGebra API. Note that for accessibilty reasons, some objects are rendered unselectable with the <c>setFixed</c> command. Perhaps this should have been done with the previous examples, but that is more difficult when you do not know all of their names.</p>
+
+                <figure>
+                    <caption>GeoGebra: from scratch</caption>
+                    <interactive xml:id="geogebra-seed-head" platform="geogebra" width="50%" aspect="1:1">
+                        <slate xml:id="seed-head" surface="geogebra" aspect="1:1">
+                            setPerspective("G");
+                            setRounding("3s");
+                            setCoordSystem(-1,1,-1,1);
+                            setGridVisible(false);
+                            setAxesVisible(false, false);
+                            evalCommand("f(x)=If(x>0,sqrt(x),0)");
+                            setVisible("f", false);
+                            evalCommand("T=20");
+                            evalCommand("t=Slider(0,T)");
+                            setAnimating("t", true);
+                            evalCommand("v=Vector((cos(t),sin(t)))");
+                            evalCommand("r=Slider(0,1)");
+                            evalCommand("r=(sqrt(5)-1)/2");
+                            evalCommand("r=Slider(0,1,0.001)");
+                            evalCommand("N=Min(100,floor(T/r))");
+                            evalCommand("Seeds = Sequence(f(t - n r) / sqrt(T) (cos(n r 2 pi), sin(n r 2 pi)), n, 0, N)");
+                            setFixed("v", false, false);
+                            setFixed("Seeds", false, false);
+                        </slate>
+                    </interactive>
+                </figure>
+
+            </subsection>
+
+            <subsection>
+                <title>threejs</title>
+
+                <p>An example using the <c>threejs</c> 3D Javascript library.  This is <url href="https://threejs.org/examples/#webgl_geometry_extrude_splines">one of the project's examples</url><fn><c>https://threejs.org/examples/#webgl_geometry_extrude_splines</c></fn>, licensed with an MIT License, with minimal modifications.  We get several of the necessary libraries from the <c>threejs.org</c> site.</p>
+
+                <figure xml:id="figure-threejs-splines">
+                    <caption><c>threejs</c> webgl_geometry_extrude_splines example</caption>
+                    <interactive xml:id="interactive-threejs-splines" platform="javascript" width="75%" aspect="1:1" preview="images/threejs-splines.png" source="https://threejs.org/build/three.js https://threejs.org/examples/js/controls/OrbitControls.js https://threejs.org/examples/js/CurveExtras.js https://threejs.org/examples/js/libs/dat.gui.min.js code/threejs/splines.js">
+                        <slate xml:id="threejs-splines" surface="div" aspect="1:1" />
                     </interactive>
                 </figure>
             </subsection>
@@ -4505,7 +4896,7 @@ the xsltproc executable.
                 <p>(2018-06-22) Almost everything in this section is under active development and not stable yet.  Feel free to experiment and make suggestions and requests.  This page takes a while to completely load, so be patient.</p>
             </introduction>
 
-            <subsection>
+            <subsection xml:id="subsection-geogebra-server">
                 <title>GeoGebra</title>
                 <idx><h>Geogebra</h><h>server</h></idx>
                 <idx><h>Geogebra</h><h>material</h></idx>
@@ -4518,11 +4909,7 @@ the xsltproc executable.
 
                 <figure>
                     <caption>Right Triangle Paradox</caption>
-                    <interactive xml:id="geogebra-right-triangle" geogebra="KGn2d4Qd" width="70%" aspect="9:5">
-                        <static>
-                            <image source="images/right-triangle-paradox.png" />
-                        </static>
-                    </interactive>
+                    <interactive xml:id="geogebra-right-triangle" geogebra="KGn2d4Qd" width="70%" aspect="9:5"/>
                 </figure>
 
                 <p>Note that materials hosted at <c>geogebra.org</c> have a non-standard, non-commercial license you must agree to before you can download them as source code.  Perhaps you must forfeit your copyright when you upload a material?  We have not investigated this thoroughly.</p>
@@ -4538,11 +4925,7 @@ the xsltproc executable.
 
                 <figure>
                     <caption>Graph of <m>ln(x^2+5)-3</m></caption>
-                    <interactive xml:id="desmos-natural-log" desmos="ttox1bvxku" width="60%" aspect="2:3">
-                        <static>
-                            <image source="images/desmos-graph.png" width="60%"/>
-                        </static>
-                    </interactive>
+                    <interactive xml:id="desmos-natural-log" desmos="ttox1bvxku" width="60%" aspect="2:3"/>
                 </figure>
 
                 <p>Note that Desmos has extensive <pubtitle>Terms of Service</pubtitle> which include restrictions on commercial uses.</p>
@@ -4570,11 +4953,7 @@ the xsltproc executable.
 
                 <figure>
                     <caption>Plot of <m>f(x,y)=\dfrac{1}{y-x^2}</m> on <m>[-2,2]\times[-2,2]</m> (full application)</caption>
-                    <interactive xml:id="calcplot3d-full-application" calcplot3d="type=z;z=1/(y-x^2);visible=true;umin=-2;umax=2;vmin=-2;vmax=2;grid=30;format=normal;alpha=-1;constcol=rgb(255,0,0);contourcolor=red&amp;type=window;hsrmode=3;anaglyph=-1;center=5.529712854135209,7.349875454071844,3.9244880634856956,1;focus=0,0,0,1;up=-0.26875302682986874,-0.2884991397174344,0.9189886054528014,1;transparent=true;alpha=140;edgeson=true;faceson=true;showbox=true;showaxes=true;showticks=true;perspective=true;centerxpercent=0.5;centerypercent=0.5;rotationsteps=30;autospin=true;xygrid=false;yzgrid=false;xzgrid=false;gridsonbox=true;gridplanes=false;gridcolor=rgb(128,128,128);xmin=-2;xmax=2;ymin=-2;ymax=2;zmin=-4;zmax=4;xscale=1;yscale=1;zscale=1;zcmin=-4;zcmax=4;zoom=0.468667;xscalefactor=1;yscalefactor=1;zscalefactor=1" variant="application" width="95%" aspect="10:13">
-                        <static>
-                            <image source="images/calcplot3d.png" width="45%"/>
-                        </static>
-                    </interactive>
+                    <interactive xml:id="calcplot3d-full-application" calcplot3d="type=z;z=1/(y-x^2);visible=true;umin=-2;umax=2;vmin=-2;vmax=2;grid=30;format=normal;alpha=-1;constcol=rgb(255,0,0);contourcolor=red&amp;type=window;hsrmode=3;anaglyph=-1;center=5.529712854135209,7.349875454071844,3.9244880634856956,1;focus=0,0,0,1;up=-0.26875302682986874,-0.2884991397174344,0.9189886054528014,1;transparent=true;alpha=140;edgeson=true;faceson=true;showbox=true;showaxes=true;showticks=true;perspective=true;centerxpercent=0.5;centerypercent=0.5;rotationsteps=30;autospin=true;xygrid=false;yzgrid=false;xzgrid=false;gridsonbox=true;gridplanes=false;gridcolor=rgb(128,128,128);xmin=-2;xmax=2;ymin=-2;ymax=2;zmin=-4;zmax=4;xscale=1;yscale=1;zscale=1;zcmin=-4;zcmax=4;zoom=0.468667;xscalefactor=1;yscalefactor=1;zscalefactor=1" variant="application" width="95%" aspect="10:13"/>
                 </figure>
             </subsection>
 
@@ -4602,207 +4981,245 @@ the xsltproc executable.
             </subsection>
         </section>
 
+        <section xml:id="section-audio">
+            <title>Audio</title>
+
+            <p>2019-05-24: this is preliminary, and mostly based on the code for <tag>video</tag> so read the next section and mimic the style from there.  But use an <tag>audio</tag> element and have the <attr>source</attr> attribute point to an OGG, MP3, or WAV file.  Plus, a <attr>height</attr> attribute will be ignored.</p>
+
+            <p>We have not entirely decided how to handle the static version present in a PDF.</p>
+
+            <figure>
+                <caption>MP3 Piano Trill (<c>www.kozco.com/tech/soundtests.html</c>)</caption>
+                <audio xml:id="audio-piano-trill" source="http://www.kozco.com/tech/piano2-CoolEdit.mp3" width="80%"/>
+            </figure>
+
+        </section>
+
         <section xml:id="section-video">
             <title>Video</title>
 
-            <p>First, a gratuitous reference to Exercise<nbsp /><xref ref="exercises-cosine-derivative" /> about the derivative of a cosine.</p>
+            <introduction>
+                <p>First, a gratuitous reference to Exercise<nbsp /><xref ref="exercises-cosine-derivative" /> about the derivative of a cosine.</p>
 
-            <p>You can specify a video by a filename if you host it as part of your document, or a <init>URL</init> giving a location on the Internet.  There are a few extra features for YouTube videos, which are near the bottom of this page, so look there first if that meets your needs.</p>
+                <p>You can specify a video by a filename if you host it as part of your document, or a <init>URL</init> giving a location on the Internet.  There are a few extra features for YouTube and Vimeo videos, which are near the bottom of this page, so look there first if that meets your needs.</p>
+            </introduction>
 
-            <p>Embedded videos can make sense for a web version of your document. This is a video promoting the University of Puget Sound to potential new students, in WebM format.  Support is limited to HTML5-capable browsers.  The file format can be MP4, Ogg, or WebM, though this may vary depending upon the browser.  Use a <tag>video</tag> element, within either a <tag>figure</tag> (numbered, captioned) or a <tag>sidebyside</tag> for more precise control.   The <attr>source</attr> attribute in this first example <em>does not</em> include an extension, and so three possibilities above will be searched for preferentially (you need only provide the video in one format, but providing additional versions will increase the chances every browser will find a compatible format).</p>
+            <subsection>
+                <title>Video Files</title>
 
-            <figure>
-                <caption>University of Puget Sound Promotional Video</caption>
-                <video source="images/ups-visitor-guide-360" width="80%" preview="images/ups-promo-frame-one.jpg" />
-            </figure>
+                <p>Embedded videos can make sense for a web version of your document. This is a video promoting the University of Puget Sound to potential new students, in WebM format.  Support is limited to HTML5-capable browsers.  The file format can be MP4, Ogg, or WebM, though this may vary depending upon the browser.  Use a <tag>video</tag> element, within either a <tag>figure</tag> (numbered, captioned) or a <tag>sidebyside</tag> for more precise control.   The <attr>source</attr> attribute in this first example <em>does not</em> include an extension, and so three possibilities above will be searched for preferentially (you need only provide the video in one format, but providing additional versions will increase the chances every browser will find a compatible format).</p>
 
-            <p>You can replace the <q>preview</q> image of a video with one of your own making.  <init>HTML</init> refers to this as the <term>poster</term>, presumably because it advertises the video.  The image you make should be of the same quality as the video, and with the same aspect-ratio, and is presumably one of the frames of the video.  So a screenshot is the likely avenue.  (Maybe we will have advice on how to do this easily, or see <url href="https://github.com/rbeezer/mathbook/issues/853" />.)  On the <tag>video</tag> tag, include a <attr>preview</attr> attribute which is the name of an image file, including a relative path.  (JPEG or PNG formats are best.  JPEG may be smaller for video screenshots, while PNG is lossless and so may work better for diagrams.)</p>
-
-            <figure>
-                <caption>University of Puget Sound Promotional Video</caption>
-                <video source="images/ups-visitor-guide-360" width="80%" preview="images/ups-promo-preview.jpg" />
-            </figure>
-
-            <p>If you find the posters distracting or objectionable, you can cover them up by requesting a generic poster with the attribute-value pair: <c>preview = "generic"</c>.</p>
-
-            <figure>
-                <caption>University of Puget Sound Promotional Video</caption>
-                <video source="images/ups-visitor-guide-360" width="80%" preview="generic" />
-            </figure>
-
-            <p>You can use a very similar construction to point to a video hosted somewhere on the Internet, just use a complete <init>URL</init> for the <tag>source</tag> attribute.  Note that if the URL has a query string (parameters following a question-mark), then any ampersands (&amp;) will need to be escaped, so as to not confuse the <init>XML</init> processor (<ie /> use <c>&amp;amp</c>).  Also, the question-mark character needs to <em>not</em> be <init>URL</init>-encoded (<c>%3F</c>), so presumably edit the <init>URL</init> to be the character.  Here are two examples, the second one uses the <attr>start</attr> and <attr>stop</attr> attributes to limit the video to just the time between the 16-second and 30-second locations.</p>
-
-            <figure>
-                <caption>Sintel (Trailer @480p), <url href="https://durian.blender.org/" /></caption>
-                <video xml:id="video-sintel" source="https://download.blender.org/durian/trailer/sintel_trailer-480p.mp4" width="100%" preview="images/sintel-trailer.jpg" />
-            </figure>
-
-            <!-- http://camendesign.com/code/video_for_everybody/test.html -->
-
-            <figure>
-                <caption>Big Buck Bunny from <q>Video for Everybody</q> Test Page at <url href="http://camendesign.com/code/video_for_everybody/test.htm"><c>camendesign.com/code/video_for_everybody/test.htm</c></url></caption>
-                <video source="http://clips.vorwaerts-gmbh.de/big_buck_bunny.webm" start="16" end="30" width="70%" preview="images/big-buck-bunny-frame-one.jpg" />
-            </figure>
-
-            <!-- A Coursera URL that expires via digital signature scheme:
-            https://d18ky98rnyall9.cloudfront.net/u5_p4_1_%20chisq_gof.77c96ac0ad8211e498e5e34296ce5455/full/360p/index.webm?Expires=1522800000&Signature=DJKrmAOfuGF4HMmWmQ2nCHnOdoeFzZd7qJzp1cfwOjQa-J~1kGNzwllMxFmGi8UXxt3wTXrhdhTQVcFQNk5nPzAi64mjJkMVu0m~QyKISqzjkFBZJm1NCnkNcbSyOk6WRDj6mjlrxEDaUSD6hHmD04ehumORG3G55Sp5OGEhYnU_&Key-Pair-Id=APKAJLTNE6QMUY6HBC5A -->
-
-            <p>YouTube<idx><h>YouTube videos</h></idx><idx><h>videos</h><h>YouTube</h></idx> videos may be embedded with only knowledge of a video's <q>ID</q> or a <q>playlist ID</q>.  A single video's YouTube ID is a string of eleven seemingly random characters that show up in the URL when you watch a video.  For the Led Zeppelin performance below, the ID is <c>hAzdgU_kpGo</c>, which you might normally watch directly from the URL <url href="https://www.youtube.com/watch?v=hAzdgU_kpGo" />.  Screen real estate is determined by specifying an optional <c>@width</c> attribute as a percentage, and aspect ratio is preserved on the assumption of HD video (16:9).  (Enhancements will include other aspect ratios.)</p>
-
-            <p>If you have ever owned a drone, you sympathize with this guy.  Way funnier than a cat video.</p>
-
-            <figure>
-                <title>My first day with my drone</title>
-                <caption>First Drone Flight (1:28)</caption>
-                <video xml:id="drone-flight-full" youtube="VsHMjWORFvI" />
-            </figure>
-
-            <p>If you are only interested in a piece of the action, you can limit the video with <c>start</c> and <c>end</c> attributes in seconds.  You might make those times clear in the caption for readers getting the link out of a PDF.  Some videos may not respect these parameters.</p>
-
-            <figure>
-                <title>My first day with my drone (Splashdown)</title>
-                <caption>First Drone Flight (Splashdown, 0:54 to 1:12)</caption>
-                <video xml:id="drone-flight-clip" youtube="VsHMjWORFvI" start="54" end="72" />
-            </figure>
-
-            <p>Videos may be placed <q>standalone</q> in a <tag>sidebyside</tag>, but are designed mostly on the assumption that they are wrapped in a <c>figure</c> with a <c>title</c> (which is distinct from a <c>caption</c>).  This video comes with a deafult poster featuring Robert Plant.  We've replaced it with Jimmy Page.</p>
-
-            <figure>
-                <title>Kashmir (Live), Led Zeppelin</title>
-                <caption>Kashmir (Live), Led Zeppelin. O2 Arena, London. December 10, 2007. (8:55)</caption>
-                <idx><h>Led Zeppelin video</h></idx>
-
-                <video xml:id="led-zeppelin-kashmir" youtube="hAzdgU_kpGo" width="70%" preview="images/jimmy-page.jpg" />
-            </figure>
-
-            <p>And if you don't want to be reminded of Plant, Page, Bonham, or Jones, you can cover them up.</p>
-
-            <figure>
-                <title>Kashmir (Live), Led Zeppelin</title>
-                <caption>Kashmir (Live), Led Zeppelin. O2 Arena, London. December 10, 2007. (8:55)</caption>
-                <idx><h>Led Zeppelin video</h></idx>
-
-                <video xml:id="led-zeppelin-kashmir-generic" youtube="hAzdgU_kpGo" width="50%" preview="generic" />
-            </figure>
-
-            <p>We can pack two videos side-by-side, with a lot of horizontal control, using two panels in the <c>sidebyside</c> element.  We have simply chose not to provide a caption (overall, or separately) as an illustration.  The sizes are purposely a bit odd.  See <xref ref="section-side-by-side" text="type-global" /> for much more on side-by-side panels.  These videos come from the <q>Topic</q> and <q>VEVO</q> areas of YouTube (respectively) and both have start/end times.</p>
-
-            <sidebyside margins="auto" widths="20% 40%" valign="middle">
-                <!-- Liza Minelli -->
-                <video xml:id="minelli-newyork-newyork" youtube="5-pyc_z7WbY" start="16" end="35" />
-                <!-- Sara Bareilles -->
-                <video xml:id="bareilles-love-song" youtube="qi7Yh16dA0w" start="60" end="120" />
-            </sidebyside>
-
-            <p>These next two videos are evenly spaced, one from YouTube, one from a source file hosted by the author.  Now with separate captions, but identical margins (through very different choices of layout parameters than in the preceding pair of videos).</p>
-
-            <sidebyside margins="10%" widths="35% 35%">
-                <!-- drone flight again-->
                 <figure>
-                    <caption>Drone Flight</caption>
-                    <video xml:id="drone-flight-sbs" youtube="VsHMjWORFvI" />
+                    <caption>University of Puget Sound Promotional Video</caption>
+                    <video source="images/ups-visitor-guide-360" width="80%" preview="images/ups-promo-frame-one.jpg" />
                 </figure>
-                <!-- UPS promo -->
+
+                <p>You can replace the <q>preview</q> image of a video with one of your own making.  <init>HTML</init> refers to this as the <term>poster</term>, presumably because it advertises the video.  The image you make should be of the same quality as the video, and with the same aspect-ratio, and is presumably one of the frames of the video.  So a screenshot is the likely avenue.  (Maybe we will have advice on how to do this easily, or see <url href="https://github.com/rbeezer/mathbook/issues/853" />.)
+                <idx><h>link</h><h>external, url</h></idx>
+                <idx><h>reference</h><h>external, url</h></idx>
+                On the <tag>video</tag> tag, include a <attr>preview</attr> attribute which is the name of an image file, including a relative path.  (JPEG or PNG formats are best.  JPEG may be smaller for video screenshots, while PNG is lossless and so may work better for diagrams.)</p>
+
                 <figure>
-                    <caption>UPS Promo</caption>
-                    <video xml:id="ups-promo-sbs" source="images/ups-visitor-guide-360" preview="images/ups-promo-frame-one.jpg"/>
+                    <caption>University of Puget Sound Promotional Video</caption>
+                    <video source="images/ups-visitor-guide-360" width="80%" preview="images/ups-promo-preview.jpg" />
                 </figure>
-            </sidebyside>
 
-            <p>A YouTube <q>playlist</q> can be built in one of two ways. You may specify the <c>youtube</c> attribute to be a space-separated list of several video IDs. Alternatively, you may set the <c>youtubeplaylist</c> attribute to a YouTube playlist ID.</p>
+                <p>If you find the posters distracting or objectionable, you can cover them up by requesting a generic poster with the attribute-value pair: <c>preview = "generic"</c>.</p>
 
-            <sidebyside margins="0%" widths="47% 47%">
                 <figure>
-                    <caption>Individual IDs specified in an <q>itemized</q> playlist</caption>
-                    <video xml:id="zeppelin-playlist" youtube="6tlSx0jkuLM FeJkDewhTEw" />
-                    <!-- https://www.youtube.com/embed?playlist=6tlSx0jkuLM,FeJkDewhTEw -->
+                    <caption>University of Puget Sound Promotional Video</caption>
+                    <video source="images/ups-visitor-guide-360" width="80%" preview="generic" />
                 </figure>
+
+                <p>You can use a very similar construction to point to a video hosted somewhere on the Internet, just use a complete <init>URL</init> for the <tag>source</tag> attribute.  Note that if the URL has a query string (parameters following a question-mark), then any ampersands (&amp;) will need to be escaped, so as to not confuse the <init>XML</init> processor (<ie /> use <c>&amp;amp</c>).  Also, the question-mark character needs to <em>not</em> be <init>URL</init>-encoded (<c>%3F</c>), so presumably edit the <init>URL</init> to be the character.  Here are two examples, the second one uses the <attr>start</attr> and <attr>stop</attr> attributes to limit the video to just the time between the 16-second and 30-second locations.</p>
+
                 <figure>
-                    <caption>YouTube playlist ID specified in a <q>named</q> playlist</caption>
-                    <video youtubeplaylist="PLGRecdYLYDNdX5NEkS3KH-ZtCqc2f8lJ_" />
-                    <!-- https://www.youtube.com/embed?listType=playlist&list=PLGRecdYLYDNdX5NEkS3KH-ZtCqc2f8lJ_ -->
+                    <caption>Sintel (Trailer @480p), <url href="https://durian.blender.org/" /></caption>
+                    <video xml:id="video-sintel" source="https://download.blender.org/durian/trailer/sintel_trailer-480p.mp4" width="100%" preview="images/sintel-trailer.jpg" />
                 </figure>
-            </sidebyside>
 
-            <p>Videos may be embedded, or popped-out to play in a new window or tab (at greater width), or a link will give the reader the option to choose either style of playback.  The automatic pop-out option requires a static thumbnail image.  (For YouTube, these images can be obtained automatically with the <c>mbx</c> script.)</p>
+                <!-- http://camendesign.com/code/video_for_everybody/test.html -->
 
-            <figure>
-                <caption>YouTube Play Location Options (<c>play-at</c> attribute)</caption>
-                <sidebyside margins="0%" width="30%">
+                <figure>
+                    <caption>Big Buck Bunny from <q>Video for Everybody</q> Test Page at <url href="http://camendesign.com/code/video_for_everybody/test.htm"><c>camendesign.com/code/video_for_everybody/test.htm</c></url></caption>
+                    <video source="http://clips.vorwaerts-gmbh.de/big_buck_bunny.webm" start="16" end="30" width="70%" preview="images/big-buck-bunny-frame-one.jpg" />
+                </figure>
+
+                <!-- A Coursera URL that expires via digital signature scheme:
+                https://d18ky98rnyall9.cloudfront.net/u5_p4_1_%20chisq_gof.77c96ac0ad8211e498e5e34296ce5455/full/360p/index.webm?Expires=1522800000&Signature=DJKrmAOfuGF4HMmWmQ2nCHnOdoeFzZd7qJzp1cfwOjQa-J~1kGNzwllMxFmGi8UXxt3wTXrhdhTQVcFQNk5nPzAi64mjJkMVu0m~QyKISqzjkFBZJm1NCnkNcbSyOk6WRDj6mjlrxEDaUSD6hHmD04ehumORG3G55Sp5OGEhYnU_&Key-Pair-Id=APKAJLTNE6QMUY6HBC5A -->
+            </subsection>
+
+            <subsection>
+                <title>YouTube</title>
+
+                <p>YouTube<idx><h>YouTube videos</h></idx><idx><h>videos</h><h>YouTube</h></idx> videos may be embedded with only knowledge of a video's <q>ID</q> or a <q>playlist ID</q>.  A single video's YouTube ID is a string of eleven seemingly random characters that show up in the URL when you watch a video.  For the Led Zeppelin performance below, the ID is <c>hAzdgU_kpGo</c>, which you might normally watch directly from the URL <url href="https://www.youtube.com/watch?v=hAzdgU_kpGo" />.  Screen real estate is determined by specifying an optional <c>@width</c> attribute as a percentage, and aspect ratio is preserved on the assumption of HD video (16:9).  (Enhancements will include other aspect ratios.)</p>
+
+                <p>If you have ever owned a drone, you sympathize with this guy.  Way funnier than a cat video.</p>
+
+                <figure>
+                    <title>My first day with my drone</title>
+                    <caption>First Drone Flight (1:28)</caption>
+                    <video xml:id="drone-flight-full" youtube="VsHMjWORFvI" />
+                </figure>
+
+                <p>If you are only interested in a piece of the action, you can limit the video with <c>start</c> and <c>end</c> attributes in seconds.  You might make those times clear in the caption for readers getting the link out of a PDF.  Some videos may not respect these parameters.</p>
+
+                <figure>
+                    <title>My first day with my drone (Splashdown)</title>
+                    <caption>First Drone Flight (Splashdown, 0:54 to 1:12)</caption>
+                    <video xml:id="drone-flight-clip" youtube="VsHMjWORFvI" start="54" end="72" />
+                </figure>
+
+                <p>Videos may be placed <q>standalone</q> in a <tag>sidebyside</tag>, but are designed mostly on the assumption that they are wrapped in a <c>figure</c> with a <c>title</c> (which is distinct from a <c>caption</c>).  This video comes with a deafult poster featuring Robert Plant.  We've replaced it with Jimmy Page.</p>
+
+                <figure>
+                    <title>Kashmir (Live), Led Zeppelin</title>
+                    <caption>Kashmir (Live), Led Zeppelin. O2 Arena, London. December 10, 2007. (8:55)</caption>
+                    <idx><h>Led Zeppelin video</h></idx>
+
+                    <video xml:id="led-zeppelin-kashmir" youtube="hAzdgU_kpGo" width="70%" preview="images/jimmy-page.jpg" />
+                </figure>
+
+                <p>And if you don't want to be reminded of Plant, Page, Bonham, or Jones, you can cover them up.</p>
+
+                <figure>
+                    <title>Kashmir (Live), Led Zeppelin</title>
+                    <caption>Kashmir (Live), Led Zeppelin. O2 Arena, London. December 10, 2007. (8:55)</caption>
+                    <idx><h>Led Zeppelin video</h></idx>
+
+                    <video xml:id="led-zeppelin-kashmir-generic" youtube="hAzdgU_kpGo" width="50%" preview="generic" />
+                </figure>
+
+                <p>We can pack two videos side-by-side, with a lot of horizontal control, using two panels in the <c>sidebyside</c> element.  We have simply chose not to provide a caption (overall, or separately) as an illustration.  The sizes are purposely a bit odd.  See <xref ref="section-side-by-side" text="type-global" /> for much more on side-by-side panels.  These videos come from the <q>Topic</q> and <q>VEVO</q> areas of YouTube (respectively) and both have start/end times.</p>
+
+                <sidebyside margins="auto" widths="20% 40%" valign="middle">
+                    <!-- Liza Minelli -->
+                    <video xml:id="minelli-newyork-newyork" youtube="5-pyc_z7WbY" start="16" end="35" />
+                    <!-- Sara Bareilles -->
+                    <video xml:id="bareilles-love-song" youtube="qi7Yh16dA0w" start="60" end="120" />
+                </sidebyside>
+
+                <p>These next two videos are evenly spaced, one from YouTube, one from a source file hosted by the author.  Now with separate captions, but identical margins (through very different choices of layout parameters than in the preceding pair of videos).</p>
+
+                <sidebyside margins="10%" widths="35% 35%">
+                    <!-- drone flight again-->
                     <figure>
-                        <caption>Embedded Only</caption>
-                        <video xml:id="pre-roll-countdown-1" youtube="gFHQ6Y0nxWs" play-at="embed" />
+                        <caption>Drone Flight</caption>
+                        <video xml:id="drone-flight-sbs" youtube="VsHMjWORFvI" />
                     </figure>
+                    <!-- UPS promo -->
                     <figure>
-                        <caption>Pop-Out Only, w/ Start/End</caption>
-                        <video xml:id="pre-roll-countdown-2" youtube="gFHQ6Y0nxWs" start="2" end="4" play-at="popout" />
-                    </figure>
-                    <figure>
-                        <caption>User Selection</caption>
-                        <video xml:id="pre-roll-countdown-3" youtube="gFHQ6Y0nxWs" play-at="select" />
+                        <caption>UPS Promo</caption>
+                        <video xml:id="ups-promo-sbs" source="images/ups-visitor-guide-360" preview="images/ups-promo-frame-one.jpg"/>
                     </figure>
                 </sidebyside>
-            </figure>
 
-            <p>Each of the three options above may have a generic play button placed over the one provided by the video.</p>
+                <p>A YouTube <q>playlist</q> can be built in one of two ways. You may specify the <c>youtube</c> attribute to be a space-separated list of several video IDs. Alternatively, you may set the <c>youtubeplaylist</c> attribute to a YouTube playlist ID.</p>
 
-            <figure>
-                <caption>YouTube with Generic Preview</caption>
-                <sidebyside margins="0%" width="30%">
+                <sidebyside margins="0%" widths="47% 47%">
                     <figure>
-                        <caption>Embedded Only</caption>
-                        <video xml:id="pre-roll-countdown-4" youtube="gFHQ6Y0nxWs" play-at="embed" preview="generic" />
+                        <caption>Individual IDs specified in an <q>itemized</q> playlist</caption>
+                        <video xml:id="zeppelin-playlist" youtube="6tlSx0jkuLM FeJkDewhTEw" />
+                        <!-- https://www.youtube.com/embed?playlist=6tlSx0jkuLM,FeJkDewhTEw -->
                     </figure>
                     <figure>
-                        <caption>Pop-Out Only, w/ Start/End</caption>
-                        <video xml:id="pre-roll-countdown-5" youtube="gFHQ6Y0nxWs" start="2" end="4" play-at="popout" preview="generic" />
-                    </figure>
-                    <figure>
-                        <caption>User Selection</caption>
-                        <video xml:id="pre-roll-countdown-6" youtube="gFHQ6Y0nxWs" play-at="select" preview="generic" />
+                        <caption>YouTube playlist ID specified in a <q>named</q> playlist</caption>
+                        <video youtubeplaylist="PLGRecdYLYDNdX5NEkS3KH-ZtCqc2f8lJ_" />
+                        <!-- https://www.youtube.com/embed?listType=playlist&list=PLGRecdYLYDNdX5NEkS3KH-ZtCqc2f8lJ_ -->
                     </figure>
                 </sidebyside>
-            </figure>
 
-            <p>Now, the six combinations above with an author-hosted video.</p>
+                <p>Videos may be embedded, or popped-out to play in a new window or tab (at greater width), or a link will give the reader the option to choose either style of playback.  The automatic pop-out option requires a static thumbnail image.  (For YouTube, these images can be obtained automatically with the <c>mbx</c> script.)</p>
 
-            <figure>
-                <caption>Author-Hosted Play Location Options (<c>play-at</c> attribute)</caption>
-                <sidebyside margins="0%" width="30%">
-                    <figure>
-                        <caption>Embedded Only</caption>
-                        <video xml:id="ups-promo-1" source="images/ups-visitor-guide-360" play-at="embed" preview="images/ups-promo-frame-one.jpg"/>
-                    </figure>
-                    <!-- A @preview is effective on next, and might become       -->
-                    <!-- necessary as part of a deprecation of the popout option -->
-                    <figure>
-                        <caption>Pop-Out Only, w/ Start/End</caption>
-                        <video xml:id="ups-promo-2" source="images/ups-visitor-guide-360" start="15" end="21" play-at="popout" />
-                    </figure>
-                    <figure>
-                        <caption>User Selection</caption>
-                        <video xml:id="ups-promo-3" source="images/ups-visitor-guide-360" play-at="select" preview="images/ups-promo-frame-one.jpg"/>
-                    </figure>
-                </sidebyside>
-            </figure>
+                <figure>
+                    <caption>YouTube Play Location Options (<c>play-at</c> attribute)</caption>
+                    <sidebyside margins="0%" width="30%">
+                        <figure>
+                            <caption>Embedded Only</caption>
+                            <video xml:id="pre-roll-countdown-1" youtube="gFHQ6Y0nxWs" play-at="embed" />
+                        </figure>
+                        <figure>
+                            <caption>Pop-Out Only, w/ Start/End</caption>
+                            <video xml:id="pre-roll-countdown-2" youtube="gFHQ6Y0nxWs" start="2" end="4" play-at="popout" />
+                        </figure>
+                        <figure>
+                            <caption>User Selection</caption>
+                            <video xml:id="pre-roll-countdown-3" youtube="gFHQ6Y0nxWs" play-at="select" />
+                        </figure>
+                    </sidebyside>
+                </figure>
 
-            <figure>
-                <caption>Author-Hosted, Generic Preview, Experimental Aspect Ratios</caption>
-                <sidebyside margins="0%" width="30%">
-                    <figure>
-                        <caption>Embedded Only</caption>
-                        <video xml:id="ups-promo-4" source="images/ups-visitor-guide-360" play-at="embed" preview="generic" aspect="4:3"/>
-                    </figure>
-                    <figure>
-                        <caption>Pop-Out Only, w/ Start/End</caption>
-                        <video xml:id="ups-promo-5" source="images/ups-visitor-guide-360" start="15" end="21" play-at="popout" preview="generic" aspect=".40"/>
-                    </figure>
-                    <figure>
-                        <caption>User Selection</caption>
-                        <video xml:id="ups-promo-6" source="images/ups-visitor-guide-360" play-at="select" preview="generic" aspect="1.05" />
-                    </figure>
-                </sidebyside>
-            </figure>
+                <p>Each of the three options above may have a generic play button placed over the one provided by the video.</p>
+
+                <figure>
+                    <caption>YouTube with Generic Preview</caption>
+                    <sidebyside margins="0%" width="30%">
+                        <figure>
+                            <caption>Embedded Only</caption>
+                            <video xml:id="pre-roll-countdown-4" youtube="gFHQ6Y0nxWs" play-at="embed" preview="generic" />
+                        </figure>
+                        <figure>
+                            <caption>Pop-Out Only, w/ Start/End</caption>
+                            <video xml:id="pre-roll-countdown-5" youtube="gFHQ6Y0nxWs" start="2" end="4" play-at="popout" preview="generic" />
+                        </figure>
+                        <figure>
+                            <caption>User Selection</caption>
+                            <video xml:id="pre-roll-countdown-6" youtube="gFHQ6Y0nxWs" play-at="select" preview="generic" />
+                        </figure>
+                    </sidebyside>
+                </figure>
+
+                <p>Now, the six combinations above with an author-hosted video.</p>
+
+                <figure>
+                    <caption>Author-Hosted Play Location Options (<c>play-at</c> attribute)</caption>
+                    <sidebyside margins="0%" width="30%">
+                        <figure>
+                            <caption>Embedded Only</caption>
+                            <video xml:id="ups-promo-1" source="images/ups-visitor-guide-360" play-at="embed" preview="images/ups-promo-frame-one.jpg"/>
+                        </figure>
+                        <!-- A @preview is effective on next, and might become       -->
+                        <!-- necessary as part of a deprecation of the popout option -->
+                        <figure>
+                            <caption>Pop-Out Only, w/ Start/End</caption>
+                            <video xml:id="ups-promo-2" source="images/ups-visitor-guide-360" start="15" end="21" play-at="popout" />
+                        </figure>
+                        <figure>
+                            <caption>User Selection</caption>
+                            <video xml:id="ups-promo-3" source="images/ups-visitor-guide-360" play-at="select" preview="images/ups-promo-frame-one.jpg"/>
+                        </figure>
+                    </sidebyside>
+                </figure>
+
+                <figure>
+                    <caption>Author-Hosted, Generic Preview, Experimental Aspect Ratios</caption>
+                    <sidebyside margins="0%" width="30%">
+                        <figure>
+                            <caption>Embedded Only</caption>
+                            <video xml:id="ups-promo-4" source="images/ups-visitor-guide-360" play-at="embed" preview="generic" aspect="4:3"/>
+                        </figure>
+                        <figure>
+                            <caption>Pop-Out Only, w/ Start/End</caption>
+                            <video xml:id="ups-promo-5" source="images/ups-visitor-guide-360" start="15" end="21" play-at="popout" preview="generic" aspect=".40"/>
+                        </figure>
+                        <figure>
+                            <caption>User Selection</caption>
+                            <video xml:id="ups-promo-6" source="images/ups-visitor-guide-360" play-at="select" preview="generic" aspect="1.05" />
+                        </figure>
+                    </sidebyside>
+                </figure>
+            </subsection>
+
+            <subsection>
+                <title>Vimeo</title>
+
+                <p>We support videos from <url href="https://vimeo.com/">Vimeo</url><fn><c>vimeo.com</c></fn> in much the same way as YouTube videos.  Now the identifier is a long integer.  For example, the video up next would normally be found at <c>https://vimeo.com/27246366</c>.  But instead, you can embed the video with as little as <c>&lt;video vimeo="27246366"/&gt;</c>.  As of 2019-05-18, we intend to support as many of the options described above as possible.  Widths and heights (via the aspect ratio) will perform as expected.  We have not investigated start and end times.</p>
+
+                <figure>
+                    <caption><articletitle>MOVE</articletitle>, by <url href="https://vimeo.com/rickmereki">Rick Mereki</url>, <c>vimeo.com/rickmereki</c></caption>
+                    <video vimeo="27246366" width="80%" preview="images/move.png"/>
+                </figure>
+            </subsection>
         </section>
 
         <!--
@@ -4867,7 +5284,9 @@ the xsltproc executable.
                 <li><p>Solution: An autonamed portion of an exercise: <xref ref="solution-antiderivative" text="type-global" /></p></li>
                 <li><p>Parts of a complicated exercise: <xref ref="exercise-complicated-second-hint" text="type-global" /> <xref ref="exercise-complicated-first-answer" text="type-global" /></p></li>
                 <li><p>A subsidary part of an exercise: <xref ref="exercise-one-two-one" /></p></li>
-                <li><p>Three cross-references to individual exercises, but due to their location, they should have different <q>type names</q> in the cross-reference: in an <tag>exercises</tag> division, <xref ref="duplicate-divisional"  text="type-global"/>; in the narrative, <xref ref="exercise-essay"  text="type-global"/>; and in a <tag>worksheet</tag>, <xref ref="exercise-vector-addition"  text="type-global"/>.</p></li>
+                <li><p>
+                       <idx><h>knowl</h><h>nested</h></idx>
+                   Three cross-references to individual exercises, but due to their location, they should have different <q>type names</q> in the cross-reference: in an <tag>exercises</tag> division, <xref ref="duplicate-divisional"  text="type-global"/>; in the narrative, <xref ref="exercise-essay"  text="type-global"/>; and in a <tag>worksheet</tag>, <xref ref="exercise-vector-addition"  text="type-global"/>.</p></li>
                 <li><p>An item buried in nested ordered lists: <xref ref="list-two-two-two-three" text="type-global"/></p></li>
                 <li><p>List item as knowls in HTML, including nested lists: <xref ref="list-two" />, <xref ref="list-two-two-two" text="type-global" /></p></li>
                 <li><p>A titled list: <xref ref="list-colors-rainbow" /></p></li>
@@ -4930,7 +5349,7 @@ the xsltproc executable.
 
 
 
-            <p>The <c>url</c><idx>url</idx> element may be used to link to a data file, either externally, or internally, if you want to make such an object available to a reader.  A good example use case is a spreadsheet that might be part of an exercise, or contain data relevant to some discussion.  First let us suppose the data resides somewhere on the Internet, then just use the complete address.  Here is one from Microsoft: <url href="http://go.microsoft.com/fwlink/?LinkID=521962">Sample Excel Spreadsheet</url>.</p>
+            <p>The <c>url</c><idx>url</idx> element may be used to link to a data file, either externally, or internally, if you want to make such an object available to a reader.<idx><h>reference</h><h>external</h></idx>  A good example use case is a spreadsheet that might be part of an exercise, or contain data relevant to some discussion.  First let us suppose the data resides somewhere on the Internet, then just use the complete address.  Here is one from Microsoft: <url href="http://go.microsoft.com/fwlink/?LinkID=521962">Sample Excel Spreadsheet</url>.</p>
 
             <p>For a link like the previous one, you might want to provide advice appropriate for your audience about using a context menu to download a file, or how to configure helper/viewer applications.</p>
 
@@ -5684,6 +6103,7 @@ the xsltproc executable.
                         </figure>
                         <figure>
                             <caption>width=25%</caption>
+                            <!-- a comment in a location like this once revealed a bug -->
                             <image source="images/cross-square.png"/>
                         </figure>
                     </sidebyside>
@@ -5779,38 +6199,6 @@ the xsltproc executable.
                         </row>
                     </tabular>
                 </table>
-            </subsection>
-
-            <subsection>
-                <title>A Single Captionless Image</title>
-
-                <p>Sometimes you may want to include a single <c>image</c> or <c>table</c> in an example or exercise without a caption.   This formerly required a <c>sidebyside</c>, but here we are testing a more direct markup. The first has width <c>10%</c>, and the second has width <c>10%</c> and left margin of <c>25%</c>.</p>
-
-                <image source="images/cross-square.png" width="10%"/>
-
-                <p>A paragraph, just to show where the first stops and the second ends.</p>
-
-                <image source="images/cross-square.png" width="10%" margins="25% 65%"/>
-
-                <p>You might wish to place a single image flush-left, or flush-right.  You can specify the <c>margins</c> attribute as a pair of percentages for different left and right margins.  The following are laid out with two margins, with a 0% left margin and right margin (respectively). </p>
-
-                <sidebyside width="10%" margins="0% 90%">
-                    <image source="images/cross-square.png"/>
-                </sidebyside>
-
-                <sidebyside width="10%" margins="90% 0%">
-                    <image source="images/cross-square.png"/>
-                </sidebyside>
-
-                <p>Results will be incorrect for the latter if the widths of the left margin and the panel do not add to 100%.  In general, in the case of a single panel, the left margin, right margin, and panel width should all add up to 100%.</p>
-
-                <p>Of course, asymmetric margins may be used with several panels.  The following is designed to leave a 25% gap between the two panels.</p>
-
-                <sidebyside width="10%" margins="45% 10%">
-                    <image source="images/cross-square.png"/>
-                    <image source="images/cross-square.png"/>
-                </sidebyside>
-
             </subsection>
 
             <subsection>
@@ -6328,7 +6716,7 @@ the xsltproc executable.
             <subsection>
                 <title>Lists in Side-by-Sides</title>
 
-                <p>A <q>regular</q> list normally belongs in a <c>p</c> but it can be placed unadorned into a panel of a side-by-side, as demonstrated below in <xref ref="subsection-sbs-other-panels" text="type-global" />.  You can also put <q>named</q> lists into a panel, and then the title, introduction, conclusion, and caption will behave as expected, along with a number that might be used in a cross-reference (<xref ref="color-list-as-panel" text="global" />), or perhaps we might cross-reference by title, <xref ref="color-list-as-panel" text="title" />.</p>
+                <p>A <q>regular</q> list normally belongs in a <c>p</c> but it can be placed unadorned into a panel of a side-by-side, as demonstrated below in <xref ref="subsection-sbs-other-panels" text="type-global" />.  You can also put <q>named</q> lists into a panel, and then the title, introduction, conclusion, and caption will behave as expected, along with a number that might be used in a cross-reference (<xref ref="color-list-as-panel" text="global" />), or perhaps we might cross-reference by title, <xref ref="color-list-as-panel" text="title" />. (2019-06-12, this list has no title>, but will soon.)</p>
 
                 <figure>
                     <caption>Two named lists</caption>
@@ -6346,7 +6734,6 @@ the xsltproc executable.
                             </ul>
                         </list>
                         <list xml:id="color-list-as-panel">
-                            <title>A List of Colors</title>
                             <caption>Color Shades</caption>
                             <idx><h>colors</h><h>shades</h></idx>
                             <ol>
@@ -7227,7 +7614,6 @@ the xsltproc executable.
                 <caption>A <tag>sidebyside</tag> with one large panel</caption>
                 <sidebyside margins="10%">
                     <figure>
-                        <title>Sometime Around Midnight</title>
                         <caption><pubtitle>Sometime Around Midnight</pubtitle>, Airborne Toxic Event, 2009</caption>
                         <video xml:id="airborne-midnight-2" youtube="UYPoMjR6-Ao" start="48" end="100" />
                     </figure>
@@ -7517,7 +7903,10 @@ the xsltproc executable.
 
                 <p><q>Names</q><idx>name</idx> for various parts of a document are determined exactly once for each language, ensuring consistency and saving you the bother of always typing them in.</p>
 
-                <p>However, you may want to have <q>Conundrum</q>s<idx><h>conundrum</h><h>repurposed from proposition</h></idx> in your document and you have no use for any <q>Proposition</q>s.  So you can repurpose the <c>proposition</c> tag to render a different name.  Or you might have a Lab Manual and want to rename <c>subsection</c> as <q>Activity</q>.  See the <c>docinfo</c> portion of this sample article to see how this is done, in concert with the example below.  Note that you may provide versions for different languages, and that the <attr>lang</attr> attribute here is just slightly different than the general <attr>@xml:lang</attr> attribute.</p>
+                <p>However, you may want to have <q>Conundrum</q>s<idx><h>conundrum</h><h>repurposed from proposition</h></idx> in your document and you have no use for any <q>Proposition</q>s.
+                    <idx><h>conundrum</h><h>repurposed from proposition</h></idx>
+                    <idx><h>rename an environment</h><h>conundrum</h></idx>
+                So you can repurpose the <c>proposition</c> tag to render a different name.  Or you might have a Lab Manual and want to rename <c>subsection</c> as <q>Activity</q>.  See the <c>docinfo</c> portion of this sample article to see how this is done, in concert with the example below.  Note that you may provide versions for different languages by specifying a <attr>xml:lang</attr> attribute.</p>
 
                 <proposition xml:id="proposition-as-conundrum">
                     <creator>Smith</creator>
@@ -8094,6 +8483,29 @@ the xsltproc executable.
                             <caption>A figure in an <tag>exercise</tag> in an <em>unstructured</em> division to test that it is numbered as if the containing <tag>exercises</tag> is not present</caption>
                             <image xml:id="cross-square-unstructured" width="10%" source="images/cross-square.png"/>
                         </figure>
+                        <figure>
+                            <caption>A side-by-side in a figure in an <tag>exercise</tag> in an <em>unstructured</em> division to test that it is numbered as if the containing <tag>exercises</tag> is not present and to test the numbering of the panels in a solutions manual</caption>
+                            <sidebyside margins="5%" width="10%">
+                                <figure>
+                                    <caption>First Panel, subcaptioned</caption>
+                                    <image xml:id="cross-square-unstructured-panel-B1" source="images/cross-square.png"/>
+                                </figure>
+                                <figure>
+                                    <caption>Second Panel, subcaptioned</caption>
+                                    <image xml:id="cross-square-unstructured-panel-B2" source="images/cross-square.png"/>
+                                </figure>
+                            </sidebyside>
+                        </figure>
+                        <sidebyside margins="5%" width="10%">
+                            <figure>
+                                <caption>First Panel, not subcaptioned</caption>
+                                <image xml:id="cross-square-unstructured-panel-A1" source="images/cross-square.png"/>
+                            </figure>
+                            <figure>
+                                <caption>Second Panel, not subcaptioned</caption>
+                                <image xml:id="cross-square-unstructured-panel-A2" source="images/cross-square.png"/>
+                            </figure>
+                        </sidebyside>
                     </statement>
                 </exercise>
 
@@ -8461,8 +8873,15 @@ the xsltproc executable.
 
             <appendix>
                 <title>Notation</title>
-                <p>This is some notation introduced in the article.</p>
+                <p>This is some notation introduced in the article.  <pretext/> allows the <q>notation list</q> generator anywhere, so we have this paragraph to test spacing above and below the table.  We'll say that again.</p>
+
+                <p>This is some notation introduced in the article.  <pretext/> allows the <q>notation list</q> generator anywhere, so we have this paragraph to test spacing above and below the table.  We'll say that again.</p>
+
                 <notation-list />
+
+                <p>This is some notation introduced in the article.  <pretext/> allows the <q>notation list</q> generator anywhere, so we have this paragraph to test spacing above and below the table.  We'll say that again.</p>
+
+                <p>This is some notation introduced in the article.  <pretext/> allows the <q>notation list</q> generator anywhere, so we have this paragraph to test spacing above and below the table.  We'll say that again.</p>
             </appendix>
 
             <solutions xml:id="solutions-backmatter" inline="hint solution answer" divisional="hint solution answer" project="answer" worksheet="hint" reading="answer">
@@ -8478,6 +8897,17 @@ the xsltproc executable.
                 <conclusion>
                     <p>And a conclusion to this solutions division, which may not be readily apparent as distinct from the final division's worth of solutions, but since it is not prefixed with a number, it may be different enough.</p>
                 </conclusion>
+            </solutions>
+
+            <solutions inline="hint solution answer" divisional="hint solution" scope="exercises-section-multiple">
+                <title>Solutions to a Single Exercises Division</title>
+                <idx><h>solutions</h><h>for one group of exercises</h></idx>
+
+                <introduction>
+                    <p>Sometimes you may want the solutions to exercises within a single <tag>exercises</tag> division (or similar, like a <tag>worksheet</tag>).  Default behavior in this situation can produce two titles, when just one would be sufficient.  Here we have used the <attr>scope</attr> attribute to point to a specific <tag>exercises</tag>, and provided a (single) very specific <tag>title</tag>.</p>
+                </introduction>
+
+                <!-- content will happen here automatically -->
             </solutions>
 
             <appendix xml:id="appendix-results">
@@ -8575,4 +9005,4 @@ the xsltproc executable.
             </colophon>
         </backmatter>
     </article>
-</mathbook>
+</pretext>

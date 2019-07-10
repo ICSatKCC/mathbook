@@ -370,9 +370,11 @@
         </xsl:variable>
         <xsl:if test="$macros != ''">
             <xsl:text>loadMacros("PCCmacros.pl");&#xa;</xsl:text>
-            <xsl:text>TEXT(KeyboardInstructions(q@\(</xsl:text>
+            <!-- @ character is unlikely to appear in latex macro definitions, -->
+            <!-- so it makes a good delimiter, better than single quote.       -->
+            <xsl:text>TEXT(MODES(PTX=>'',HTML=>q@&lt;div style="display:none;">\(</xsl:text>
             <xsl:value-of select="$macros" />
-            <xsl:text>\)@));&#xa;</xsl:text>
+            <xsl:text>\)&lt;/div>@));&#xa;</xsl:text>
         </xsl:if>
     </xsl:if>
     <xsl:if test="$b-verbose">
@@ -714,8 +716,8 @@
                 <xsl:when test="$b-verbose">
                     <xsl:text>  "contextFiniteSolutionSets.pl",&#xa;</xsl:text>
                 </xsl:when>
-                    <xsl:text>"contextFiniteSolutionSets.pl",</xsl:text>
                 <xsl:otherwise>
+                    <xsl:text>"contextFiniteSolutionSets.pl",</xsl:text>
                 </xsl:otherwise>
             </xsl:choose>
         </xsl:if>
@@ -852,24 +854,7 @@
     <xsl:if test="(count(preceding-sibling::*)+count(preceding-sibling::text()))=0 and parent::p/parent::statement">
         <xsl:text>    </xsl:text>
     </xsl:if>
-    <xsl:text>[</xsl:text>
-    <!-- for small width, print underscores; otherwise, specify by number -->
-    <xsl:choose>
-        <xsl:when test="$width &lt; 13">
-            <xsl:call-template name="duplicate-string">
-                <xsl:with-param name="count" select="$width" />
-                <xsl:with-param name="text"  select="'_'" />
-            </xsl:call-template>
-        </xsl:when>
-        <xsl:otherwise>
-            <xsl:text>_</xsl:text> <!-- width specified after evaluator -->
-            <!-- NECESSARY? -->
-            <xsl:if test="$b-verbose">
-                <xsl:text>_</xsl:text>
-            </xsl:if>
-        </xsl:otherwise>
-    </xsl:choose>
-    <xsl:text>]</xsl:text>
+    <xsl:text>[_]</xsl:text>
     <!-- multiplier for MathObjects like Matrix, Vector, ColumnVector -->
     <xsl:if test="@form='array'">
         <xsl:text>*</xsl:text>
@@ -884,18 +869,9 @@
         </xsl:otherwise>
     </xsl:choose>
     <xsl:text>}</xsl:text>
-    <xsl:if test="$width &gt; 12">
-        <xsl:choose>
-            <xsl:when test="$b-verbose">
-                <xsl:text>{width => </xsl:text>
-            </xsl:when>
-            <xsl:otherwise>
-                <xsl:text>{width=></xsl:text>
-            </xsl:otherwise>
-        </xsl:choose>
-        <xsl:value-of select="$width"/>
-        <xsl:text>}</xsl:text>
-    </xsl:if>
+    <xsl:text>{</xsl:text>
+    <xsl:value-of select="$width"/>
+    <xsl:text>}</xsl:text>
 </xsl:template>
 
 <!-- Checkbox answers -->
@@ -1310,7 +1286,7 @@
     <xsl:if test="ancestor::ul|ancestor::ol">
         <xsl:call-template name="potential-list-indent" />
     </xsl:if>
-    <xsl:apply-templates select="text()|var" />
+    <xsl:apply-templates select="text()|var|xref" />
     <xsl:if test="not(following-sibling::*[self::mrow or self::intertext])">
         <!-- look ahead to absorb immediate clause-ending punctuation -->
         <!-- pass the enclosing environment (md) as the context       -->
@@ -1498,10 +1474,10 @@
     <xsl:param name="b-verbose" />
     <xsl:choose>
         <xsl:when test="$b-verbose">
-            <xsl:text>[@MODES(HTML =&gt; '\(\mathrm\LaTeX\)', TeX =&gt; '\LaTeX', PTX =&gt; '&lt;latex/&gt;')@]*</xsl:text>
+            <xsl:text>[$LATEX]*</xsl:text>
         </xsl:when>
         <xsl:otherwise>
-            <xsl:text>[@MODES(HTML=&gt;'\(\mathrm\LaTeX\)',TeX=&gt;'\LaTeX', PTX=&gt;'&lt;latex/&gt;')@]*</xsl:text>
+            <xsl:text>[$TEX]*</xsl:text>
         </xsl:otherwise>
     </xsl:choose>
 </xsl:template>
@@ -1592,7 +1568,8 @@
 <!-- * -, + Escape these if they are the first non-white space       -->
 <!--       character on a line or they will start an unordered list. -->
 <!--                                                                 -->
-<!-- * ```  three backticks start "code" (seems not?, unimplemented) -->
+<!-- * ```  three backticks start and end "code" which is more like  -->
+<!--        PTX pre                                                  -->
 <!--                                                                 -->
 <!-- * :  A line opening with a colon and two (three) spaces makes   -->
 <!--      preformatted text. (not really a verbatim block)           -->
@@ -1619,6 +1596,7 @@
 <xsl:template name="greater-character">
     <xsl:text>&gt;</xsl:text>
 </xsl:template>
+
 <!-- Percent sign -->
 <xsl:template name="percent-character">
     <xsl:text>%</xsl:text>
@@ -1720,10 +1698,10 @@
     <xsl:variable name="rbracket-fixed"  select="str:replace($lbracket-fixed,  ']', '\]')"/>
 
     <!-- We translate textual apostrophes to the escape sequence [$APOS] -->
-    <xsl:variable name="apostrophe-fixed"  select="str:replace($rbracket-fixed, $apostrophe, '[$APOS]')"/>
+    <!-- <xsl:variable name="apostrophe-fixed"  select="str:replace($rbracket-fixed, $apostrophe, '[$APOS]')"/> -->
 
     <!-- Break up right justify AND center line -->
-    <xsl:variable name="centerline-fixed" select="str:replace($apostrophe-fixed, '&gt;&gt; ', '\&gt;\&gt;')"/>
+    <xsl:variable name="centerline-fixed" select="str:replace($rbracket-fixed, '&gt;&gt; ', '\&gt;\&gt;')"/>
 
     <!-- Break up any possibility of paired underscores for italics (overkill) -->
     <xsl:variable name="italicization-fixed" select="str:replace($centerline-fixed, '_', '\_')"/>
@@ -1763,14 +1741,48 @@
     </xsl:choose>
 </xsl:template>
 
+<!-- Lines of Code -->
+<!-- Note this contruct uses PGML ```,                   -->
+<!-- so it will return with the encompassing p closed,   -->
+<!-- and inside a pre. WeBWorK doesn't really know where -->
+<!-- p's open and close, so we can't hop to return cd.   -->
+<xsl:template match="cd">
+    <xsl:text>&#xa;</xsl:text>
+    <xsl:call-template name="potential-list-indent" />
+    <xsl:text>```&#xa;</xsl:text>
+    <!-- Subsequent lines of PGML should not be indented -->
+    <xsl:choose>
+        <xsl:when test="cline">
+            <xsl:apply-templates select="cline" />
+        </xsl:when>
+        <xsl:otherwise>
+            <xsl:call-template name="sanitize-text">
+                <xsl:with-param name="text" select="." />
+            </xsl:call-template>
+        </xsl:otherwise>
+    </xsl:choose>
+    <xsl:text>```&#xa;</xsl:text>
+</xsl:template>
+
+<xsl:template match="cline">
+    <xsl:variable name="trimmed-text">
+        <xsl:call-template name="sanitize-text">
+            <xsl:with-param name="text" select="." />
+        </xsl:call-template>
+    </xsl:variable>
+    <!-- Remove carriage return, then append three spaces and carriage return for PGML line break -->
+    <xsl:value-of select="concat(substring($trimmed-text, 1, string-length($trimmed-text) - 1),'   &#xa;')"/>
+</xsl:template>
+
+
 <!-- Preformatted Text -->
 <!-- Sanitization analyzes *all* lines for left margin. -->
 <xsl:template match="pre">
-    <xsl:text>```</xsl:text>
+    <xsl:text>```&#xa;</xsl:text>
     <xsl:call-template name="sanitize-text">
         <xsl:with-param name="text" select="." />
     </xsl:call-template>
-    <xsl:text>```&#xa;</xsl:text>
+    <xsl:text>```&#xa;&#xa;</xsl:text>
 </xsl:template>
 
 <!-- The next three are WW macros that PGML will format  -->

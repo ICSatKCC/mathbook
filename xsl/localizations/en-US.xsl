@@ -65,6 +65,7 @@ along with MathBook XML.  If not, see <http://www.gnu.org/licenses/>.
     <localization string-id='memo'><xsl:text>Memo</xsl:text></localization>
     <localization string-id='presentation'><xsl:text>Presentation</xsl:text></localization>
     <!-- Parts of a document -->
+    <!-- "part" will also be used for a "stage" of a WeBWorK problem -->
     <localization string-id='frontmatter'><xsl:text>Front Matter</xsl:text></localization>
     <localization string-id='part'><xsl:text>Part</xsl:text></localization>
     <localization string-id='chapter'><xsl:text>Chapter</xsl:text></localization>
@@ -183,8 +184,8 @@ along with MathBook XML.  If not, see <http://www.gnu.org/licenses/>.
     <localization string-id='jump-to'><xsl:text>Jump to:</xsl:text></localization>
     <!-- Parts of the Index -->
     <localization string-id='index'><xsl:text>Index</xsl:text></localization>
-    <localization string-id='see'><xsl:text>see</xsl:text></localization>
-    <localization string-id='also'><xsl:text>see also</xsl:text></localization>
+    <localization string-id='see'><xsl:text>See</xsl:text></localization>
+    <localization string-id='also'><xsl:text>See also</xsl:text></localization>
     <!-- Notation List headings/foot -->
     <localization string-id='symbol'><xsl:text>Symbol</xsl:text></localization>
     <localization string-id='description'><xsl:text>Description</xsl:text></localization>

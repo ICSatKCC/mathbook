@@ -35,7 +35,12 @@ test specific errors or warnings, and/or to test
 improvements to the error/warning/deprecation
 systems.
 -->
-<mathbook>
+<pretext>
+
+    <docinfo>
+        <!-- rename/lang  replaced by  rename/@xml:lang -->
+        <rename element="proposition" lang="en-US">Conundrum</rename>
+    </docinfo>
 
     <article xml:id="errors-and-warnings">
         <title>Errors and Warnings in MathBook XML</title>
@@ -59,6 +64,12 @@ systems.
         <section filebase="obsolete-way-to-introduce-filename-strings">
             <title>Introduction</title>
             <p>A sample paragraph.</p>
+            <!-- these index entries should prompt warnings -->
+            <!-- a "see" must not have a page locator       -->
+            <idx><h>ACK</h></idx>
+            <idx><h>ACK</h><see>Yuck</see></idx>
+            <!-- a "seealso" needs to have a page locator -->
+            <idx><h>SND</h><seealso>Yuck</seealso></idx>
         </section>
 
         <section>
@@ -78,6 +89,8 @@ systems.
             <p>A cross-reference to a range with incompatible targets (article and section):  <xref first="errors-and-warnings" last="introduction-id" />.</p>
 
             <p>A cross-reference to a range where the two targets are in the wrong order, so generates a warning:  <xref first="section-images" last="introduction-id" />.</p>
+
+            <todo>A <tag>todo</tag> element now becomes a prefixed XML comment.</todo>
         </section>
 
         <section>
@@ -147,6 +160,12 @@ systems.
 
                 <p>There has always been a sort of odd mini-sectioning element, called <c>paragraph</c> orignally since that is what it is in <latex/>, but now better named as <c>paragraphs</c>.</p>
             </paragraph>
+
+            <!-- # $ % ^ & _ { } ~ \  -->
+            <p><latex/>'s ten reserved characters once each had an empty element of its own: <hash/> <dollar/> <percent/> <circumflex/> <ampersand/> <underscore/> <lbrace/> <rbrace/> <tilde/> <backslash/>.</p>
+
+            <!-- <, >, [, ], *, /, `, braces and brackets  -->
+            <p>And similarly, nine other elements were made redundant:  <less/> <greater/> <lbracket/> <rbracket/> <asterisk/> <slash/> <backtick/> <braces>braces</braces> <brackets>brackets</brackets>.</p>
 
             <p>Tables once looked like this, but now are really different.</p>
 
@@ -516,7 +535,75 @@ systems.
                         <p>The missing number is <var name="$x"/>.</p>
                     </solution>
             </exercise>
+
+                <figure>
+                    <caption>Two named lists</caption>
+                    <sidebyside widths="30% 60%" valign="top">
+                        <list>
+                            <caption>Sea Life</caption>
+                            <title>Employed, so Caption is commented</title>
+                            <introduction>
+                                <p>Dr. Seuss again.</p>
+                            </introduction>
+                            <ul>
+                                <li>One fish</li>
+                                <li>Two fish</li>
+                                <li>Red fish</li>
+                                <li>Blue fish</li>
+                            </ul>
+                        </list>
+                        <list xml:id="color-list-as-panel">
+                            <caption>Color Shades</caption>
+                            <idx><h>colors</h><h>shades</h></idx>
+                            <ol>
+                                <li><p>Blue<ol>
+                                    <li>Light</li>
+                                    <li>Navy</li>
+                                    <li>Royal</li>
+                                </ol></p></li>
+                                <li><p>Red<ol>
+                                    <li>Maroon</li>
+                                    <li>Pink</li>
+                                    <li>Shocking</li>
+                                </ol></p></li>
+                            </ol>
+                            <conclusion>
+                                <p>This ends our example.</p>
+                            </conclusion>
+                        </list>
+                    </sidebyside>
+                </figure>
+
+                <table>
+                    <caption>Supported Currency</caption>
+                    <tabular>
+                        <row bottom="medium">
+                            <cell>Sign</cell>
+                            <cell>Unicode</cell>
+                            <cell>Name</cell>
+                        </row>
+                        <row>
+                            <cell>&#x0024;</cell>
+                            <cell><c>U+0024</c></cell>
+                            <cell>dollar</cell>
+                        </row>
+                        <row>
+                            <cell>&#x00a2;</cell>
+                            <cell><c>U+00A2</c></cell>
+                            <cell>cent</cell>
+                        </row>
+                    </tabular>
+                </table>
+
         </section>
+
+        <backmatter>
+            <!-- need an index to provoke error warnings above -->
+            <index>
+                <title>Index</title>
+                <index-list />
+            </index>
+        </backmatter>
     </article>
 
-</mathbook>
+</pretext>
