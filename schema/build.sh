@@ -37,11 +37,11 @@ shopt -s -o nounset
 # ***********
 
 # PreTeXt distribution
-declare MB=${HOME}/mathbook/mathbook
+declare MB=${HOME}/Documents/OER_ICS141_PROJECT/mathbook
 # DocFlex installation
 declare DFH=/opt/docflex/docflex-xml-1.12
 # DocFlex output directory
-declare DFOUTDIR=${HOME}/mathbook/website/pretextbook.org/doc/schema
+declare DFOUTDIR=${HOME}/Documents/OER_ICS141_PROJECT/mathbook/website/pretextbook.org/doc/schema
 # Java root to locate executables
 # (if not set by system: uncomment and set)
 # declare JAVA_HOME=

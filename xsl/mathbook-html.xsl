@@ -203,7 +203,8 @@ along with MathBook XML.  If not, see <http://www.gnu.org/licenses/>.
 <!-- NB: the exact same value, for similar,  -->
 <!-- but not identical, reasons is used in   -->
 <!-- the formation of WeBWorK problems       -->
-<xsl:variable name="design-width" select="'600'" />
+<!-- Lisa change  <xsl:variable name="design-width" select="'600'" /> -->
+<xsl:variable name="design-width" select="'650'" />
 
 <!-- We generally want to chunk longer HTML output -->
 <xsl:variable name="chunk-level">

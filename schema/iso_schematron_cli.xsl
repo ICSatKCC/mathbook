@@ -34,7 +34,7 @@ along with PreTeXt.  If not, see <http://www.gnu.org/licenses/>.
       xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
       xmlns:axsl="http://www.w3.org/1999/XSL/TransformAlias">
 
-<xsl:import href="/home/rob/mathbook/schematron/trunk/schematron/code/iso_schematron_skeleton_for_xslt1.xsl"/>
+<xsl:import href="/home/Documents/OER_ICS141_PROJECT/mathbook/schematron/trunk/schematron/code/iso_schematron_skeleton_for_xslt1.xsl"/>
 
 <!-- Causes early output=text declaration -->
 <xsl:template name="process-prolog">
